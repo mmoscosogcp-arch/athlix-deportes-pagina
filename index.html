@@ -1901,15 +1901,15 @@ initProducts();
 // 2. Crea un "Email Service" conectado a Gmail
 // 3. Crea un "Email Template" (ver instrucciones en GUIA_CORREO.md)
 // 4. Pega los 3 valores aquí abajo:
-const EMAILJS_PUBLIC_KEY  = 'PEGA_TU_PUBLIC_KEY';   // Account → API Keys
-const EMAILJS_SERVICE_ID  = 'PEGA_TU_SERVICE_ID';   // Email Services → Service ID
-const EMAILJS_TEMPLATE_ID = 'PEGA_TU_TEMPLATE_ID';  // Email Templates → Template ID
+const EMAILJS_PUBLIC_KEY  = 'r7_SrOlZzRAZXW4aW';   // Account → API Keys
+const EMAILJS_SERVICE_ID  = 'service_yugh7of';   // Email Services → Service ID
+const EMAILJS_TEMPLATE_ID = 'template_4hfovon';  // Email Templates → Template ID
 // ════════════════════════════════════════════════════════════════
 
 // Inicializar EmailJS
-if (EMAILJS_PUBLIC_KEY !== 'PEGA_TU_PUBLIC_KEY') {
-  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-}
+emailjs.init({
+  publicKey: EMAILJS_PUBLIC_KEY
+});
 
 function toggleCheck(label) {
   label.classList.toggle('checked');
