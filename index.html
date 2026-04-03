@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Athlix Store — Equipamiento Deportivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root {
+    --black: #0B1F3A;
+    --white: #F5F5F5;
+    --blue: #F26A21;
+    --blue-dark: #D4561A;
+    --blue-light: #FFF0E8;
+    --yellow: #FFB703;
+    --green: #16A34A;
+    --green-dark: #15803D;
+    --bg: #F5F5F5;
+    --surface: #FFFFFF;
+    --surface-2: #D9D3C7;
+    --dark-surface: #0B1F3A;
+    --text: #1A1A1A;
+    --text-2: #6B6560;
+    --gray-100: #F0EDE8;
+    --gray-200: #E5E0D8;
+    --gray-400: #9A9490;
+    --gray-600: #6B6560;
+    --gray-800: #3A3632;
+    --accent: #DC2626;
+    --font-display: 'Montserrat', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+    --nav-h: 64px;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { text-decoration: none; color: inherit; }
+  button { font-family: var(--font-body); cursor: pointer; border: none; outline: none; }
+  /* ─── NAVBAR ─── */
+  .nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    height: var(--nav-h);
+    background: var(--black);
+    display: flex; align-items: center;
+    padding: 0 5vw;
+    gap: 2rem;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 900;
+    letter-spacing: 0.06em;
+    color: var(--white);
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--blue); }
+  .nav-links {
+    display: flex; gap: 0;
+    list-style: none;
+    margin-left: 0.5rem;
+  }
+  .nav-links a {
+    font-size: 13px; font-weight: 500; letter-spacing: 0.02em;
+    color: rgba(245,245,245,0.6);
+    padding: 6px 14px;
+    border-radius: 6px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a.active { color: var(--blue); font-weight: 600; }
+  .nav-spacer { flex: 1; }
+  .nav-search {
+    display: flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: rgba(245,245,245,0.5);
+    font-size: 13px; font-family: var(--font-body);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    min-width: 180px;
+  }
+  .nav-search:hover { border-color: rgba(255,255,255,0.3); color: var(--white); }
+  .nav-actions { display: flex; align-items: center; gap: 0.5rem; }
+  .nav-cart {
+    position: relative;
+    background: var(--blue);
+    color: #fff;
+    border-radius: 8px;
+    padding: 8px 18px;
+    font-size: 13px; font-weight: 600; font-family: var(--font-body);
+    display: flex; align-items: center; gap: 8px;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .nav-cart:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .cart-badge {
+    background: var(--yellow);
+    color: #1A1A1A;
+    border-radius: 999px;
+    min-width: 18px; height: 18px;
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0 4px;
+  }
+  .nav-icon-btn {
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    background: transparent;
+    color: rgba(245,245,245,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    transition: color 0.2s;
+  }
+  .nav-icon-btn:hover { color: var(--white); }
+  .hamburger { display: none; }
+  /* ─── PAGE WRAPPER ─── */
+  .page { padding-top: var(--nav-h); }
+  /* ─── SECTION TRANSITIONS ─── */
+  section { display: none; }
+  section.active { display: block; }
+  /* ─── HERO ─── */
+  .hero {
+    background: var(--black);
+    min-height: calc(100vh - var(--nav-h));
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    position: relative;
+  }
+  .hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(242,106,33,0.08) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .hero-left {
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 5vw 3vw 5vw 5vw;
+    z-index: 2;
+  }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(242,106,33,0.12);
+    border: 1px solid rgba(242,106,33,0.3);
+    border-radius: 999px;
+    padding: 5px 16px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 1.75rem;
+    width: fit-content;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(42px, 5.5vw, 80px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--white);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+  }
+  .hero-title .line-accent { color: var(--blue); }
+  .hero-title .line-stroke {
+    -webkit-text-stroke: 2px rgba(245,245,245,0.4);
+    color: transparent;
+  }
+  .hero-sub {
+    font-size: 16px; line-height: 1.75;
+    color: rgba(245,245,245,0.6);
+    max-width: 420px;
+    margin-bottom: 2.5rem;
+  }
+  .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+    padding: 14px 30px;
+    border-radius: 9px;
+    font-size: 14px; font-weight: 700; font-family: var(--font-body); letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,106,33,0.35); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--white);
+    padding: 14px 30px;
+    border-radius: 9px;
+    border: 1.5px solid rgba(245,245,245,0.25);
+    font-size: 14px; font-weight: 600; font-family: var(--font-body);
+    transition: border-color 0.2s, background 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-secondary:hover { border-color: rgba(245,245,245,0.6); background: rgba(245,245,245,0.06); }
+  .hero-stats {
+    display: flex; gap: 2.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(245,245,245,0.1);
+  }
+  .hero-stat-num {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 800;
+    color: var(--white);
+    line-height: 1;
+  }
+  .hero-stat-label { font-size: 11px; color: rgba(245,245,245,0.5); margin-top: 4px; letter-spacing: 0.04em; text-transform: uppercase; }
+  .hero-right {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    background: rgba(255,255,255,0.03);
+  }
+  .hero-bg-circle { display: none; }
+  .hero-img-placeholder {
+    position: relative; z-index: 2;
+    width: 90%;
+    aspect-ratio: 4/3;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(242,106,33,0.25);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.4);
+  }
+  .hero-img-placeholder img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-img-icon { font-size: 80px; filter: drop-shadow(0 0 20px rgba(242,106,33,0.3)); }
+  .hero-img-label {
+    font-family: var(--font-display);
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(245,245,245,0.4);
+  }
+  .hero-floating-badge { display: none; }
+  .hero-stripe { display: none; }
+  /* ─── MARQUEE ─── */
+  .marquee-wrap {
+    background: var(--blue);
+    padding: 10px 0;
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: flex; gap: 0;
+    animation: marquee 28s linear infinite;
+    white-space: nowrap;
+  }
+  .marquee-item {
+    font-family: var(--font-display);
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: rgba(255,255,255,0.9);
+    padding: 0 2rem;
+    display: inline-flex; align-items: center; gap: 1rem;
+  }
+  .marquee-dot { width: 4px; height: 4px; background: rgba(255,255,255,0.5); border-radius: 50%; }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  /* ─── SECTIONS LAYOUT ─── */
+  .section-inner { max-width: 1200px; margin: 0 auto; padding: 80px 5vw; }
+  .section-header { margin-bottom: 3rem; }
+  .section-tag {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3.5vw, 46px);
+    font-weight: 900;
+    line-height: 1.05;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .section-sub {
+    font-size: 15px; color: var(--text-2);
+    margin-top: 0.75rem;
+    max-width: 500px;
+    line-height: 1.75;
+    font-weight: 400;
+    text-transform: none;
+  }
+  /* ─── CATEGORIES ─── */
+  .categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 1rem;
+  }
+  .cat-card {
+    background: var(--black);
+    border-radius: var(--radius);
+    padding: 28px 20px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba(255,255,255,0.06);
+    position: relative; overflow: hidden;
+  }
+  .cat-card::before {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 3px; background: var(--blue);
+    transform: scaleX(0); transition: transform 0.2s;
+    transform-origin: left;
+  }
+  .cat-card:hover { background: rgba(11,31,58,0.85); transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
+  .cat-card:hover::before { transform: scaleX(1); }
+  .cat-emoji { font-size: 36px; }
+  .cat-name {
+    font-family: var(--font-display);
+    font-size: 15px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase;
+    color: var(--white);
+    text-align: center;
+  }
+  .cat-count { font-size: 11px; color: rgba(245,245,245,0.4); font-weight: 500; }
+  /* ─── FEATURED SECTION ─── */
+  .featured-wrap { background: var(--surface-2); padding: 80px 0; }
+  .featured-inner { max-width: 1200px; margin: 0 auto; padding: 0 5vw; }
+  .featured-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem; }
+  .featured-header .section-title { color: var(--text); }
+  .featured-header .section-tag { color: var(--blue); }
+  .see-all {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+    color: var(--blue);
+    display: flex; align-items: center; gap: 6px;
+    transition: gap 0.2s;
+  }
+  .see-all:hover { gap: 10px; }
+  /* ─── PRODUCT GRID ─── */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1.5rem;
+  }
+  .product-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+  }
+  .product-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); }
+  .product-card.dark-card { background: var(--surface); border-color: var(--gray-200); }
+  .product-img {
+    aspect-ratio: 4/3;
+    background: var(--gray-100);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .product-img img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .dark-card .product-img { background: var(--gray-100); }
+  .product-badge {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--blue);
+    color: white;
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 4px 10px; border-radius: 5px;
+  }
+  .product-badge.green { background: var(--green); }
+  .product-badge.blue { background: var(--black); }
+  .badge-sin-stock {
+    position: absolute; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 13px; letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .add-to-cart:disabled { opacity: 0.35; cursor: not-allowed; }
+  .product-wishlist {
+    position: absolute; top: 10px; right: 10px;
+    width: 32px; height: 32px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .product-card:hover .product-wishlist { opacity: 1; }
+  .product-info { padding: 18px; }
+  .product-brand { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+  .product-name { font-size: 15px; font-weight: 600; line-height: 1.35; margin-bottom: 10px; color: var(--text); font-family: var(--font-display); }
+  .dark-card .product-name { color: var(--text); }
+  .product-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+  .product-tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.04em;
+    background: var(--gray-100); color: var(--text-2);
+    padding: 3px 9px; border-radius: 4px;
+  }
+  .dark-card .product-tag { background: var(--gray-100); color: var(--text-2); }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; }
+  .product-price { display: flex; flex-direction: column; }
+  .price-main {
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 800; line-height: 1;
+    color: var(--black);
+  }
+  .dark-card .price-main { color: var(--black); }
+  .price-old { font-size: 12px; color: var(--gray-400); text-decoration: line-through; }
+  .price-abono { font-size: 11px; color: var(--green); font-weight: 600; margin-top: 3px; }
+  .add-to-cart {
+    background: var(--blue);
+    color: white;
+    border-radius: 8px;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    transition: background 0.2s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .add-to-cart:hover { background: var(--blue-dark); transform: scale(1.08); }
+  /* ─── BENEFITS ─── */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 1.5rem;
+  }
+  .benefit-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    border: 1px solid var(--gray-200);
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .benefit-card::after {
+    content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 3px; background: var(--blue);
+    transform: scaleX(0); transition: transform 0.25s;
+    transform-origin: left;
+  }
+  .benefit-card:hover { border-color: var(--gray-200); box-shadow: 0 8px 32px rgba(0,0,0,0.08); transform: translateY(-3px); }
+  .benefit-card:hover::after { transform: scaleX(1); }
+  .benefit-icon { font-size: 28px; margin-bottom: 16px; }
+  .benefit-title { font-family: var(--font-display); font-weight: 800; font-size: 16px; margin-bottom: 8px; color: var(--text); text-transform: uppercase; letter-spacing: 0.02em; }
+  .benefit-desc { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  /* ─── BANNER ABONO ─── */
+  .abono-banner {
+    background: var(--black);
+    border-radius: var(--radius);
+    padding: 52px 5vw;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .abono-banner::before {
+    content: ''; position: absolute;
+    right: -80px; bottom: -80px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(242,106,33,0.08);
+    pointer-events: none;
+  }
+  .abono-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+  .abono-title { font-family: var(--font-display); font-size: clamp(26px, 3vw, 42px); font-weight: 900; text-transform: uppercase; line-height: 1.05; color: var(--white); margin-bottom: 12px; }
+  .abono-desc { font-size: 15px; color: rgba(245,245,245,0.55); max-width: 460px; line-height: 1.75; }
+  .abono-steps { display: flex; gap: 0.75rem; margin-top: 1.75rem; flex-wrap: wrap; }
+  .abono-step {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-size: 13px; font-weight: 500; color: rgba(245,245,245,0.75);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .step-num {
+    width: 20px; height: 20px;
+    background: var(--blue);
+    color: white;
+    border-radius: 50%;
+    font-size: 10px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .abono-cta {
+    background: var(--blue);
+    color: white;
+    padding: 14px 30px;
+    border-radius: 9px;
+    font-size: 14px; font-weight: 700; font-family: var(--font-body);
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    white-space: nowrap;
+  }
+  .abono-cta:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,106,33,0.35); }
+  /* ─── CATALOG PAGE ─── */
+  .catalog-header-bar {
+    background: var(--black);
+    padding: 28px 5vw;
+  }
+  .catalog-header-bar .section-tag { color: var(--blue); }
+  .catalog-header-bar .section-title { color: var(--white); }
+  .catalog-header-inner { max-width: 1200px; margin: 0 auto; }
+  .catalog-layout { max-width: 1200px; margin: 0 auto; padding: 2rem 5vw; display: grid; grid-template-columns: 220px 1fr; gap: 2rem; }
+  .filters-panel {
+    position: sticky; top: calc(var(--nav-h) + 1rem);
+    height: fit-content;
+  }
+  .filter-group { margin-bottom: 1.75rem; }
+  .filter-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); margin-bottom: 0.75rem; }
+  .filter-options { display: flex; flex-direction: column; gap: 4px; }
+  .filter-opt {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 14px; color: var(--text); cursor: pointer;
+    padding: 6px 8px; border-radius: 7px;
+    transition: background 0.15s;
+  }
+  .filter-opt:hover { background: var(--gray-100); }
+  .filter-opt input { accent-color: var(--blue); width: 15px; height: 15px; cursor: pointer; }
+  .filter-count { margin-left: auto; font-size: 11px; color: var(--text-2); }
+  .filter-price-range { display: flex; gap: 10px; }
+  .price-input {
+    flex: 1;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px; font-family: var(--font-body);
+    outline: none; transition: border-color 0.2s;
+    background: var(--white); color: var(--text);
+    width: 100%;
+  }
+  .price-input:focus { border-color: var(--blue); }
+  .catalog-top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+  .result-count { font-size: 14px; color: var(--text-2); }
+  .result-count strong { color: var(--text); }
+  .sort-select {
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 14px; font-family: var(--font-body);
+    outline: none; cursor: pointer;
+    background: var(--white);
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .sort-select:focus { border-color: var(--blue); }
+  .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .active-filter {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--blue-light);
+    border: 1px solid rgba(232,93,4,0.25);
+    border-radius: 999px;
+    padding: 4px 12px;
+    font-size: 12px; font-weight: 600; color: var(--blue);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .active-filter:hover { background: #FFE8D6; }
+  /* ─── PRODUCT DETAIL ─── */
+  .detail-layout { max-width: 1200px; margin: 0 auto; padding: 3rem 5vw; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+  .detail-gallery-main {
+    background: var(--gray-100);
+    border-radius: var(--radius);
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 120px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+  .detail-gallery-thumbs { display: flex; gap: 12px; margin-top: 12px; }
+  .thumb {
+    width: 72px; height: 72px;
+    background: var(--gray-100);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    border: 2px solid var(--gray-200);
+    transition: border-color 0.15s;
+  }
+  .thumb.active { border-color: var(--blue); }
+  .detail-breadcrumb { font-size: 12px; color: var(--text-2); margin-bottom: 1.5rem; }
+  .detail-breadcrumb span { color: var(--text); }
+  .detail-brand { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--blue); margin-bottom: 6px; }
+  .detail-title { font-family: var(--font-display); font-size: 34px; font-weight: 800; line-height: 1.1; margin-bottom: 12px; color: var(--text); }
+  .detail-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 1.5rem; }
+  .stars { color: #f59e0b; font-size: 14px; letter-spacing: 2px; }
+  .rating-count { font-size: 13px; color: var(--text-2); }
+  .detail-price { margin-bottom: 1.5rem; }
+  .price-big { font-family: var(--font-display); font-size: 44px; font-weight: 900; line-height: 1; color: var(--text); }
+  .price-desc { font-size: 13px; color: var(--text-2); margin-top: 4px; }
+  .abono-info-box {
+    background: var(--blue-light);
+    border: 1px solid rgba(232,93,4,0.2);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+  .abono-icon { font-size: 22px; }
+  .abono-text { font-size: 13px; line-height: 1.5; color: var(--text); }
+  .abono-text strong { color: var(--blue); }
+  .detail-section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); margin-bottom: 10px; }
+  .talla-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .talla-btn {
+    width: 44px; height: 44px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    font-size: 13px; font-weight: 600;
+    background: var(--white); color: var(--text); cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .talla-btn:hover { border-color: var(--blue); }
+  .talla-btn.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); }
+  .talla-btn.unavailable { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
+  .color-grid { display: flex; gap: 10px; margin-bottom: 1.5rem; }
+  .color-swatch {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    outline: 2px solid transparent;
+    transition: outline-color 0.15s;
+  }
+  .color-swatch.active { outline-color: var(--blue); outline-offset: 2px; }
+  .qty-control { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .qty-btn {
+    width: 36px; height: 36px;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px; background: var(--white); color: var(--text);
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s;
+  }
+  .qty-btn:hover { border-color: var(--blue); }
+  .qty-num { font-size: 18px; font-weight: 700; min-width: 24px; text-align: center; color: var(--text); }
+  .detail-ctas { display: flex; gap: 12px; margin-bottom: 1.5rem; }
+  .detail-ctas .btn-primary { flex: 1; justify-content: center; padding: 16px; font-size: 15px; }
+  .btn-wish {
+    width: 52px; height: 52px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px; background: var(--white); color: var(--text-2); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; transition: border-color 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .btn-wish:hover { border-color: var(--accent); color: var(--accent); }
+  .detail-features { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.5rem; }
+  .detail-feat {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; padding: 10px 14px;
+    font-size: 13px; font-weight: 500; color: var(--text-2);
+  }
+  .feat-icon { font-size: 16px; }
+  /* ─── SOBRE NOSOTROS ─── */
+  .about-hero {
+    background: var(--black);
+    padding: 90px 5vw;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .about-hero::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 100%, rgba(242,106,33,0.1) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .about-hero-inner { max-width: 680px; margin: 0 auto; position: relative; z-index: 1; }
+  .about-hero .section-title { color: var(--white); font-size: clamp(36px, 5vw, 68px); }
+  .about-hero .section-tag { color: var(--blue); display: block; text-align: center; }
+  .about-hero-sub { color: rgba(245,245,245,0.55); font-size: 16px; line-height: 1.8; margin-top: 1rem; text-transform: none; font-family: var(--font-body); font-weight: 400; }
+  .about-values { background: var(--surface-2); }
+  .values-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+  .value-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 32px 24px;
+    text-align: center;
+    border: 1px solid var(--gray-200);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .value-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); }
+  .value-icon { font-size: 34px; margin-bottom: 1rem; }
+  .value-title { font-family: var(--font-display); font-size: 18px; font-weight: 900; text-transform: uppercase; margin-bottom: 8px; color: var(--text); }
+  .value-desc { font-size: 13px; color: var(--text-2); line-height: 1.7; }
+  .about-story { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+  .story-img {
+    aspect-ratio: 4/3;
+    background: var(--black);
+    border-radius: var(--radius);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .story-img-text {
+    position: absolute; bottom: 20px; left: 20px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 8px;
+    padding: 8px 14px;
+  }
+  .story-img-text strong { font-size: 20px; font-family: var(--font-display); font-weight: 900; display: block; color: var(--text); }
+  .story-img-text span { font-size: 11px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; }
+  .story-text .section-title { margin-bottom: 1.5rem; }
+  .story-text p { font-size: 15px; line-height: 1.85; color: var(--text-2); margin-bottom: 1rem; }
+  .clients-logos { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; margin-top: 2rem; }
+  .client-logo {
+    background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .client-logo:hover { border-color: var(--blue); color: var(--blue); }
+  /* ─── CONTACTO ─── */
+  .contact-layout { display: grid; grid-template-columns: 1fr 1.5fr; gap: 4rem; }
+  .contact-info { display: flex; flex-direction: column; gap: 2rem; }
+  .contact-item { display: flex; gap: 16px; }
+  .contact-icon-wrap {
+    width: 46px; height: 46px;
+    background: var(--black); border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0;
+    border: 1px solid rgba(242,106,33,0.2);
+  }
+  .contact-item-title { font-family: var(--font-display); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; color: var(--text); }
+  .contact-item-val { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+  .contact-form-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius);
+    padding: 36px 32px;
+  }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-grid.full { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-label { font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-2); }
+  .form-input, .form-select, .form-textarea {
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 11px 14px;
+    font-size: 14px; font-family: var(--font-body);
+    background: var(--white); color: var(--text); outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--blue); }
+  .form-textarea { resize: vertical; min-height: 100px; }
+  .form-actions { margin-top: 0.5rem; }
+  .form-actions .btn-primary { width: 100%; justify-content: center; padding: 14px; font-size: 15px; }
+  .form-note { font-size: 12px; color: var(--text-2); margin-top: 10px; text-align: center; }
+  /* ─── FOOTER ─── */
+  .footer { background: #071429; border-top: 1px solid rgba(255,255,255,0.06); padding: 60px 0 28px; }
+  .footer-inner { max-width: 1200px; margin: 0 auto; padding: 0 5vw; }
+  .footer-top { display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 3rem; margin-bottom: 3rem; }
+  .footer-logo { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--white); letter-spacing: 0.06em; margin-bottom: 1rem; }
+  .footer-logo span { color: var(--blue); }
+  .footer-tagline { font-size: 14px; color: rgba(245,245,245,0.35); line-height: 1.7; max-width: 240px; margin-bottom: 1.5rem; }
+  .footer-social { display: flex; gap: 8px; }
+  .social-btn {
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    transition: background 0.2s, transform 0.15s;
+    color: rgba(245,245,245,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .social-btn:hover { background: var(--blue); color: white; transform: translateY(-2px); border-color: var(--blue); }
+  .footer-col-title { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,245,245,0.3); margin-bottom: 1.25rem; }
+  .footer-links { display: flex; flex-direction: column; gap: 10px; }
+  .footer-links a { font-size: 14px; color: rgba(245,245,245,0.5); transition: color 0.2s; }
+  .footer-links a:hover { color: var(--white); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,0.06); padding-top: 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+  .footer-copy { font-size: 12px; color: rgba(245,245,245,0.25); }
+  .footer-methods { display: flex; gap: 8px; align-items: center; }
+  .payment-method { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 5px; padding: 5px 10px; font-size: 11px; font-weight: 600; color: rgba(245,245,245,0.35); letter-spacing: 0.04em; }
+  /* ─── MOBILE NAV ─── */
+  @media (max-width: 900px) {
+    .nav-links, .nav-search { display: none; }
+    .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
+    .hamburger span { width: 22px; height: 2px; background: var(--white); border-radius: 2px; display: block; transition: all 0.3s; }
+    .hero { grid-template-columns: 1fr; min-height: auto; }
+    .hero-right { display: none; }
+    .hero-left { padding: 48px 5vw; }
+    .footer-top { grid-template-columns: 1fr 1fr; }
+    .catalog-layout { grid-template-columns: 1fr; }
+    .filters-panel { position: static; }
+    .about-story { grid-template-columns: 1fr; }
+    .detail-layout { grid-template-columns: 1fr; }
+    .contact-layout { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .abono-banner { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .footer-top { grid-template-columns: 1fr; }
+    .hero-stats { gap: 1.5rem; }
+    .hero-title { font-size: 48px; }
+  }
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--text);
+    color: white;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-size: 14px; font-weight: 600;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    transform: translateY(80px); opacity: 0;
+    transition: transform 0.3s, opacity 0.3s;
+    pointer-events: none;
+    border-left: 3px solid var(--blue);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--gray-100); }
+  ::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+  /* ─── CART DRAWER ─── */
+  .cart-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.4);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .cart-overlay.open { opacity: 1; pointer-events: all; }
+  .cart-drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; z-index: 301;
+    width: 400px; max-width: 95vw;
+    background: var(--white);
+    border-left: 1px solid var(--gray-200);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    box-shadow: -8px 0 32px rgba(0,0,0,0.08);
+  }
+  .cart-overlay.open .cart-drawer { transform: translateX(0); }
+  .cart-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .cart-title {
+    font-family: var(--font-display);
+    font-size: 20px; font-weight: 800;
+    color: var(--text);
+  }
+  .cart-close {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: var(--gray-100); border: none; cursor: pointer; color: var(--text-2);
+    font-size: 18px; display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+  }
+  .cart-close:hover { background: var(--gray-200); }
+  .cart-items {
+    flex: 1; overflow-y: auto;
+    padding: 16px 24px;
+  }
+  .cart-empty {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; height: 100%;
+    gap: 14px; color: var(--text-2);
+    text-align: center; padding: 2rem;
+  }
+  .cart-empty-icon { font-size: 52px; }
+  .cart-empty-text { font-size: 14px; line-height: 1.6; }
+  .cart-item {
+    display: flex; gap: 12px; align-items: center;
+    background: var(--white); border: 1px solid var(--gray-200);
+    border-radius: 10px; padding: 12px 14px;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+  }
+  .cart-item:hover { border-color: var(--gray-400); }
+  .cart-item-emoji {
+    font-size: 30px; width: 50px; height: 50px;
+    background: var(--gray-100); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .cart-item-info { flex: 1; min-width: 0; }
+  .cart-item-name {
+    font-size: 13px; font-weight: 600; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    margin-bottom: 4px;
+  }
+  .cart-item-price {
+    font-family: var(--font-display); font-size: 17px; font-weight: 800;
+    color: var(--blue);
+  }
+  .cart-item-controls {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  }
+  .cart-qty-btn {
+    width: 26px; height: 26px; border-radius: 6px;
+    background: var(--gray-100); border: 1px solid var(--gray-200); color: var(--text);
+    font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .cart-qty-btn:hover { background: var(--blue); border-color: var(--blue); color: white; }
+  .cart-qty-num { font-size: 14px; font-weight: 700; color: var(--text); min-width: 20px; text-align: center; }
+  .cart-item-remove {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: transparent; border: none; cursor: pointer; color: var(--text-2);
+    font-size: 15px; display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s, background 0.15s;
+    margin-left: 2px;
+  }
+  .cart-item-remove:hover { color: var(--accent); background: #FEE2E2; }
+  .cart-footer {
+    padding: 18px 24px 24px;
+    border-top: 1px solid var(--gray-200);
+    background: var(--gray-100);
+    flex-shrink: 0;
+  }
+  .cart-subtotal {
+    display: flex; justify-content: space-between;
+    align-items: center; margin-bottom: 16px;
+  }
+  .cart-subtotal-label { font-size: 13px; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+  .cart-subtotal-amount {
+    font-family: var(--font-display); font-size: 28px; font-weight: 900;
+    color: var(--text);
+  }
+  .cart-checkout-btn {
+    width: 100%; padding: 15px;
+    background: var(--blue); color: white; border: none;
+    border-radius: 10px; font-size: 15px; font-weight: 600;
+    font-family: var(--font-body); cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    margin-bottom: 10px;
+  }
+  .cart-checkout-btn:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .cart-continue-btn {
+    width: 100%; padding: 11px;
+    background: transparent; color: var(--text-2);
+    border: 1px solid var(--gray-200); border-radius: 10px;
+    font-size: 13px; font-weight: 600;
+    font-family: var(--font-body); cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .cart-continue-btn:hover { border-color: var(--gray-400); color: var(--text); }
+  /* ─── WHATSAPP FLOTANTE ─── */
+  .wa-float {
+    position: fixed; bottom: 28px; right: 28px; z-index: 500;
+    width: 58px; height: 58px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 4px 20px rgba(37,211,102,0.45);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+  }
+  .wa-float:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(37,211,102,0.6); }
+  .wa-tooltip {
+    position: absolute; right: 70px; top: 50%;
+    transform: translateY(-50%);
+    background: var(--black); color: white;
+    font-size: 12px; font-weight: 600;
+    white-space: nowrap; padding: 6px 12px;
+    border-radius: 8px; pointer-events: none;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .wa-float:hover .wa-tooltip { opacity: 1; }
+  /* ─── MODAL OVERLAY ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.65);
+    display: flex; align-items: center; justify-content: center;
+    padding: 1rem;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--white); border-radius: 20px;
+    border: 1px solid var(--gray-200);
+    width: 100%; max-width: 520px;
+    max-height: 90vh; overflow-y: auto;
+    transform: translateY(20px); transition: transform 0.25s;
+    padding: 36px 32px;
+    color: var(--text);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.12);
+  }
+  .modal-overlay.open .modal-box { transform: translateY(0); }
+  .modal-close {
+    position: absolute; top: 16px; right: 16px;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--gray-100); border: none; cursor: pointer; color: var(--text-2);
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+  .modal-close:hover { background: var(--gray-200); }
+  .modal-header { position: relative; margin-bottom: 1.5rem; }
+  .modal-title { font-family: var(--font-display); font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--text); }
+  .modal-subtitle { font-size: 14px; color: var(--text-2); margin-top: 6px; }
+  .abono-plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 1.5rem 0; }
+  .abono-plan-card {
+    border: 1.5px solid var(--gray-200); border-radius: 12px; padding: 16px;
+    background: var(--white);
+    cursor: pointer; transition: border-color 0.15s, background 0.15s;
+    text-align: center;
+  }
+  .abono-plan-card:hover { border-color: var(--blue); }
+  .abono-plan-card.selected { border-color: var(--blue); background: var(--blue-light); }
+  .plan-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-2); margin-bottom: 4px; }
+  .plan-pct { font-family: var(--font-display); font-size: 32px; font-weight: 900; color: var(--blue); line-height: 1; }
+  .plan-amount { font-size: 13px; font-weight: 600; color: var(--text-2); margin-top: 4px; }
+  .plan-desc { font-size: 11px; color: var(--text-2); margin-top: 6px; line-height: 1.4; }
+  .payment-methods-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 1rem 0 1.5rem; }
+  .pay-method-btn {
+    border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 12px;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    background: var(--white); color: var(--text); font-family: var(--font-body);
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .pay-method-btn:hover { border-color: var(--blue); }
+  .pay-method-btn.selected { border-color: var(--blue); background: var(--blue-light); }
+  .pay-method-icon { font-size: 22px; }
+  .pay-method-name { font-size: 13px; font-weight: 700; display: block; }
+  .pay-method-sub { font-size: 11px; color: var(--gray-400); display: block; }
+  .modal-summary {
+    background: #242424; border: 1px solid #3a3a3a; border-radius: 10px; padding: 14px 16px;
+    margin-bottom: 1.5rem;
+  }
+  .summary-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+  .summary-row.total { font-weight: 700; font-size: 16px; border-top: 1px solid #3a3a3a; margin-top: 8px; padding-top: 10px; }
+  .summary-row.highlight { color: var(--blue); font-weight: 600; }
+  .modal-notice {
+    background: #fffbeb; border: 1px solid #fcd34d; border-radius: 8px;
+    padding: 10px 14px; font-size: 12px; color: #92400e;
+    margin-bottom: 1.5rem; line-height: 1.5;
+  }
+  .modal-btn-confirm {
+    width: 100%; padding: 15px;
+    background: var(--blue); color: white; border: none;
+    border-radius: 10px; font-size: 15px; font-weight: 700;
+    font-family: var(--font-body); cursor: pointer;
+    letter-spacing: 0.04em; text-transform: uppercase;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .modal-btn-confirm:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .modal-steps { display: flex; gap: 8px; margin-bottom: 1.5rem; align-items: center; }
+  .mstep {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 600;
+    color: var(--gray-400);
+  }
+  .mstep.active { color: var(--blue); }
+  .mstep-num {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #3a3a3a; color: #aaaaaa;
+    font-size: 11px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .mstep.active .mstep-num { background: var(--blue); color: white; }
+  .mstep-sep { flex: 1; height: 1px; background: var(--gray-200); }
+  /* ─── FORMSPREE NOTE ─── */
+  .formspree-note {
+    background: var(--blue-light); border: 1px solid rgba(232,93,4,0.2);
+    border-radius: 10px; padding: 12px 16px;
+    font-size: 13px; color: var(--blue);
+    margin-bottom: 1.5rem; line-height: 1.6;
+  }
+  .formspree-note strong { display: block; margin-bottom: 2px; }
+
+  /* ─── COTIZACIÓN FORM ─── */
+  .cotiz-layout {
+    display: grid; grid-template-columns: 1fr 1.6fr; gap: 3rem; align-items: start;
+  }
+  .cotiz-info { display: flex; flex-direction: column; gap: 20px; }
+  .cotiz-info-card {
+    background: var(--black); border-radius: var(--radius); padding: 24px;
+    color: var(--white);
+  }
+  .cotiz-info-card h3 {
+    font-family: var(--font-display); font-size: 14px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 0.1em; color: var(--blue); margin-bottom: 16px;
+  }
+  .cotiz-step {
+    display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px;
+  }
+  .cotiz-step:last-child { margin-bottom: 0; }
+  .cotiz-step-num {
+    width: 28px; height: 28px; border-radius: 50%; background: var(--blue);
+    color: white; font-size: 12px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .cotiz-step-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--white); }
+  .cotiz-step-text span { font-size: 12px; color: rgba(245,245,245,0.5); }
+  .cotiz-guarantee {
+    display: flex; gap: 12px; align-items: center;
+    background: rgba(242,106,33,0.1); border: 1px solid rgba(242,106,33,0.25);
+    border-radius: 10px; padding: 16px;
+  }
+  .cotiz-guarantee-icon { font-size: 28px; flex-shrink: 0; }
+  .cotiz-guarantee-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
+  .cotiz-guarantee-text span { font-size: 12px; color: rgba(245,245,245,0.5); }
+
+  .cotiz-form-card {
+    background: white; border-radius: var(--radius); padding: 32px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07); border: 1px solid var(--gray-200);
+  }
+  .cotiz-form-title {
+    font-family: var(--font-display); font-size: 20px; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 0.04em; color: var(--black); margin-bottom: 24px;
+  }
+  .cotiz-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .cotiz-row.full { grid-template-columns: 1fr; }
+  .cotiz-group { display: flex; flex-direction: column; gap: 6px; }
+  .cotiz-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-2);
+  }
+  .cotiz-input, .cotiz-select, .cotiz-textarea {
+    padding: 12px 14px; border: 2px solid var(--gray-200); border-radius: 10px;
+    font-size: 14px; font-family: var(--font-body); color: var(--text); background: white;
+    outline: none; transition: border-color 0.2s; width: 100%;
+  }
+  .cotiz-input:focus, .cotiz-select:focus, .cotiz-textarea:focus { border-color: var(--blue); }
+  .cotiz-textarea { resize: vertical; min-height: 110px; }
+  .cotiz-products-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px;
+  }
+  .cotiz-product-check {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 12px; border: 2px solid var(--gray-200); border-radius: 8px;
+    cursor: pointer; transition: border-color 0.2s, background 0.2s; font-size: 13px;
+    user-select: none;
+  }
+  .cotiz-product-check:hover { border-color: var(--blue); background: var(--blue-light); }
+  .cotiz-product-check input { accent-color: var(--blue); width: 15px; height: 15px; }
+  .cotiz-product-check.checked { border-color: var(--blue); background: var(--blue-light); font-weight: 600; }
+  .cotiz-submit {
+    width: 100%; padding: 16px; background: var(--blue); color: white;
+    border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s; margin-top: 6px;
+    font-family: var(--font-body); letter-spacing: 0.02em;
+  }
+  .cotiz-submit:hover { background: var(--blue-dark); }
+  .cotiz-submit:disabled { opacity: 0.55; cursor: not-allowed; }
+  .cotiz-note { text-align: center; font-size: 12px; color: var(--text-2); margin-top: 10px; }
+  .cotiz-success {
+    text-align: center; padding: 2.5rem 1rem; display: none;
+  }
+  .cotiz-success-icon { font-size: 56px; margin-bottom: 1rem; }
+  .cotiz-success-title { font-family: var(--font-display); font-size: 24px; font-weight: 900; color: var(--black); margin-bottom: 8px; }
+  .cotiz-success-sub { font-size: 14px; color: var(--text-2); line-height: 1.7; }
+
+  @media (max-width: 900px) {
+    .cotiz-layout { grid-template-columns: 1fr; }
+    .cotiz-info-card { display: none; }
+  }
+  @media (max-width: 600px) {
+    .cotiz-row { grid-template-columns: 1fr; }
+    .cotiz-products-grid { grid-template-columns: 1fr; }
+    .cotiz-form-card { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+<!-- ─── NAVBAR ─── -->
+<nav class="nav">
+  <div class="nav-logo">ATHLIX <span>STORE</span></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active" onclick="showSection('home'); setActive(this)">Inicio</a></li>
+    <li><a href="#" onclick="showSection('catalog'); setActive(this)">Catálogo</a></li>
+    <li><a href="#" onclick="showSection('about'); setActive(this)">Nosotros</a></li>
+    <li><a href="#" onclick="showSection('contact'); setActive(this)">Cotización</a></li>
+  </ul>
+  <div class="nav-spacer"></div>
+  <div class="nav-search" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1])">
+    <span>🔍</span> Buscar productos...
+  </div>
+  <div class="nav-actions">
+    <button class="nav-icon-btn" title="Favoritos">♡</button>
+    <button class="nav-cart" onclick="openCart()">
+      <span>Carrito</span>
+      <div class="cart-badge">0</div>
+    </button>
+    <button class="hamburger" onclick="toggleMobileMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+<div class="page">
+<!-- ═══════════════════════════════════════════ HOME ═══════ -->
+<section class="active" id="home">
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-tag">Fabricación profesional · Chile</div>
+      <h1 class="hero-title">
+        <span>Equipamiento</span><br>
+        <span class="line-accent">deportivo</span><br>
+        <span class="line-stroke">profesional.</span>
+      </h1>
+      <p class="hero-sub">Arcos de fútbol, taca-taca, tableros de básquetbol y parantes de voleibol. Fabricados para durar, diseñados para rendir.</p>
+      <div class="hero-ctas">
+        <a class="btn-primary" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Cotiza tu proyecto →</a>
+        <a class="btn-secondary" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1])" style="cursor:pointer">Ver productos</a>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="hero-stat-num">A medida</div>
+          <div class="hero-stat-label">Fabricación propia</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">Cuotas</div>
+          <div class="hero-stat-label">Sin interés</div>
+        </div>
+        <div>
+          <div class="hero-stat-num">Todo Chile</div>
+          <div class="hero-stat-label">Envío y despacho</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-bg-circle"></div>
+      <div class="hero-img-placeholder">
+        <img src="Productos/arco_3x2_dospulgadas.png" alt="Arco de fútbol Athlix">
+      </div>
+      <div class="hero-floating-badge badge-top">✔ Envío gratis sobre $50.000</div>
+      <div class="hero-floating-badge badge-bottom">💳 Pago en cuotas sin interés</div>
+      <div class="hero-stripe"></div>
+    </div>
+  </div>
+  <!-- Marquee -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marquee">
+      <!-- JS duplicated -->
+    </div>
+  </div>
+  <!-- Categorías -->
+  <div style="background:var(--black)">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag" style="color:var(--blue)">Explora por deporte</span>
+      <h2 class="section-title" style="color:var(--white)">Nuestras<br>categorías</h2>
+    </div>
+    <div class="categories-grid">
+      <div class="cat-card" onclick="filterCatalog('Fútbol')">
+        <div class="cat-emoji">⚽</div>
+        <div class="cat-name">Fútbol</div>
+        <div class="cat-count">4 productos</div>
+      </div>
+      <div class="cat-card" onclick="filterCatalog('Básquetbol')">
+        <div class="cat-emoji">🏀</div>
+        <div class="cat-name">Básquetbol</div>
+        <div class="cat-count">3 productos</div>
+      </div>
+      <div class="cat-card" onclick="filterCatalog('Voleibol')">
+        <div class="cat-emoji">🏐</div>
+        <div class="cat-name">Voleibol</div>
+        <div class="cat-count">2 productos</div>
+      </div>
+      <div class="cat-card" onclick="filterCatalog('Taca Taca')">
+        <div class="cat-emoji">🎯</div>
+        <div class="cat-name">Taca Taca</div>
+        <div class="cat-count">2 productos</div>
+      </div>
+      <div class="cat-card" onclick="filterCatalog('Otros deportes')">
+        <div class="cat-emoji">🏅</div>
+        <div class="cat-name">Otros deportes</div>
+        <div class="cat-count">1 producto</div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <!-- Productos destacados -->
+  <div class="featured-wrap">
+    <div class="featured-inner">
+      <div class="featured-header">
+        <div>
+          <span class="section-tag">Productos</span>
+          <h2 class="section-title">Lo más<br>solicitado</h2>
+        </div>
+        <a class="see-all" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1])" style="cursor:pointer">Ver todo →</a>
+      </div>
+      <div class="products-grid" id="featured-grid"></div>
+    </div>
+  </div>
+  <!-- Beneficios -->
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">¿Por qué Athlix?</span>
+      <h2 class="section-title">Construido para<br>el rendimiento</h2>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon">🔩</div>
+        <div class="benefit-title">Alta durabilidad</div>
+        <div class="benefit-desc">Materiales de primera: acero galvanizado, madera MDF y plástico resistente. Equipamiento que dura años, no meses.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">📐</div>
+        <div class="benefit-title">Fabricación a medida</div>
+        <div class="benefit-desc">Personalizamos dimensiones, colores e instalación según tu espacio. Cada proyecto es único.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">🏫</div>
+        <div class="benefit-title">Enfoque B2B</div>
+        <div class="benefit-desc">Atendemos colegios, municipalidades, empresas y clubes. Precios especiales para pedidos corporativos.</div>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon">💳</div>
+        <div class="benefit-title">Pago en cuotas</div>
+        <div class="benefit-desc">Separa con un abono y paga el saldo al recibir. Sin trámites complicados ni intereses ocultos.</div>
+      </div>
+    </div>
+  </div>
+  <!-- Banner abono -->
+  <div class="section-inner" style="padding-top:0">
+    <div class="abono-banner">
+      <div>
+        <div class="abono-tag">Financiamiento flexible</div>
+        <div class="abono-title">Equipa tu espacio<br>sin estrés de presupuesto</div>
+        <div class="abono-desc">Separa con un abono inicial y coordinamos el saldo antes del despacho. Sin cobros ocultos, sin letra chica. Ideal para colegios, municipios y clubes.</div>
+        <div class="abono-steps">
+          <div class="abono-step"><div class="step-num">1</div>Elige tu producto</div>
+          <div class="abono-step"><div class="step-num">2</div>Deja tu abono</div>
+          <div class="abono-step"><div class="step-num">3</div>Define las cuotas</div>
+          <div class="abono-step"><div class="step-num">4</div>Recibe tu pedido</div>
+        </div>
+      </div>
+      <a class="abono-cta" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Consultar ahora</a>
+    </div>
+  </div>
+</section>
+<!-- ═══════════════════════════════════════════ CATALOG ═══════ -->
+<section id="catalog">
+  <div class="catalog-header-bar">
+    <div class="catalog-header-inner">
+      <span class="section-tag">Catálogo</span>
+      <h1 class="section-title" style="font-size:clamp(28px,3vw,42px)">Todo nuestro<br>equipamiento</h1>
+    </div>
+  </div>
+  <div class="catalog-layout">
+    <!-- Filters -->
+    <aside class="filters-panel">
+      <div class="filter-group">
+        <div class="filter-title">Deporte</div>
+        <div class="filter-options" id="sport-filters">
+          <label class="filter-opt"><input type="checkbox" value="Fútbol" onchange="applyFilters()"> Fútbol <span class="filter-count">4</span></label>
+          <label class="filter-opt"><input type="checkbox" value="Básquetbol" onchange="applyFilters()"> Básquetbol <span class="filter-count">3</span></label>
+          <label class="filter-opt"><input type="checkbox" value="Voleibol" onchange="applyFilters()"> Voleibol <span class="filter-count">2</span></label>
+          <label class="filter-opt"><input type="checkbox" value="Taca Taca" onchange="applyFilters()"> Taca Taca <span class="filter-count">2</span></label>
+          <label class="filter-opt"><input type="checkbox" value="Otros deportes" onchange="applyFilters()"> Otros deportes <span class="filter-count">2</span></label>
+        </div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-title">Precio</div>
+        <div class="filter-price-range">
+          <input type="number" class="price-input" placeholder="Mín" id="price-min" onchange="applyFilters()">
+          <input type="number" class="price-input" placeholder="Máx" id="price-max" onchange="applyFilters()">
+        </div>
+      </div>
+      <button onclick="clearFilters()" style="width:100%; padding: 10px; border-radius:8px; border: 1px solid var(--gray-200); background:var(--white); color:var(--text-2); font-size:13px; font-weight:600; cursor:pointer; font-family:var(--font-body); transition: border-color 0.15s, color 0.15s;" onmouseover="this.style.borderColor='#E85D04'; this.style.color='#E85D04'" onmouseout="this.style.borderColor=''; this.style.color=''">✕ Limpiar filtros</button>
+    </aside>
+    <!-- Products -->
+    <div>
+      <div class="catalog-top-bar">
+        <div class="result-count">Mostrando <strong id="result-num">12</strong> productos</div>
+        <select class="sort-select" onchange="applyFilters()">
+          <option>Más vendidos</option>
+          <option>Precio: menor a mayor</option>
+          <option>Precio: mayor a menor</option>
+          <option>Más recientes</option>
+        </select>
+      </div>
+      <div class="active-filters" id="active-filters-display"></div>
+      <div class="products-grid" id="catalog-grid"></div>
+    </div>
+  </div>
+</section>
+<!-- ═══════════════════════════════════════════ DETAIL ═══════ -->
+<section id="detail">
+  <div class="detail-layout" id="detail-content"></div>
+</section>
+<!-- ═══════════════════════════════════════════ ABOUT ═══════ -->
+<section id="about">
+  <div class="about-hero">
+    <div class="about-hero-inner">
+      <span class="section-tag">Nuestra historia</span>
+      <h1 class="section-title" style="color:var(--white); font-size:clamp(38px,5vw,72px)">Fabricamos el equipamiento<br>que <span style="color:var(--blue)">marca la diferencia.</span></h1>
+      <p class="about-hero-sub">Empresa chilena especializada en fabricación y venta de equipamiento deportivo profesional. Atendemos colegios, municipalidades, clubes y empresas en todo el país.</p>
+    </div>
+  </div>
+  <div class="about-values">
+    <div class="section-inner">
+      <div class="section-header" style="text-align:center">
+        <span class="section-tag" style="text-align:center; display:block">Lo que nos define</span>
+        <h2 class="section-title">Nuestros valores</h2>
+      </div>
+      <div class="values-grid">
+        <div class="value-card">
+          <div class="value-icon">⚡</div>
+          <div class="value-title">Energía</div>
+          <div class="value-desc">Ponemos pasión en cada entrega. Sabemos que detrás de cada producto hay un equipo listo para competir.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🏆</div>
+          <div class="value-title">Calidad</div>
+          <div class="value-desc">Trabajamos solo con marcas y materiales que cumplan los más altos estándares deportivos.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🤝</div>
+          <div class="value-title">Confianza</div>
+          <div class="value-desc">El 90% de nuestros clientes vuelve. Eso dice más que cualquier eslogan.</div>
+        </div>
+        <div class="value-card">
+          <div class="value-icon">🎯</div>
+          <div class="value-title">Rendimiento</div>
+          <div class="value-desc">Seleccionamos equipamiento que realmente mejora el desempeño, no solo que se vea bien.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section-inner">
+    <div class="about-story">
+      <div class="story-img">
+        <span>🏟️</span>
+        <div class="story-img-text">
+          <strong>2019</strong>
+          <span>Fundación Athlix Store</span>
+        </div>
+      </div>
+      <div class="story-text">
+        <span class="section-tag">De dónde venimos</span>
+        <h2 class="section-title">Más de 5 años<br>vistiendo campeones</h2>
+        <p>Athlix Store nació en 2019 con la idea de acercar equipamiento deportivo de calidad a quienes más lo necesitan: los equipos que no tienen acceso a grandes tiendas o presupuestos ajustados.</p>
+        <p>Hoy trabajamos con colegios, clubes, empresas y deportistas individuales en todo Chile. Hemos equipado desde el torneo del barrio hasta la liga regional, y cada pedido lo tratamos con el mismo cuidado.</p>
+        <p>Creemos que el deporte transforma vidas, y nuestro rol es asegurarnos de que la falta de equipamiento nunca sea el obstáculo.</p>
+        <div class="clients-logos">
+          <div class="client-logo">🏫 Colegios</div>
+          <div class="client-logo">🏢 Empresas</div>
+          <div class="client-logo">🏆 Clubes</div>
+          <div class="client-logo">🎽 Federaciones</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ═══════════════════════════════════════════ CONTACT ═══════ -->
+<section id="contact">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Cotización sin compromiso</span>
+      <h1 class="section-title">¿Qué necesitas<br>para tu proyecto?</h1>
+      <p class="section-sub">Completa el formulario y te enviamos cotización detallada en menos de 24 horas. Atendemos colegios, municipios, clubes y empresas.</p>
+    </div>
+
+    <div class="cotiz-layout">
+
+      <!-- Columna izquierda: info -->
+      <div class="cotiz-info">
+        <div class="cotiz-info-card">
+          <h3>¿Cómo funciona?</h3>
+          <div class="cotiz-step">
+            <div class="cotiz-step-num">1</div>
+            <div class="cotiz-step-text">
+              <strong>Completas el formulario</strong>
+              <span>Nos cuentas qué necesitas y tus datos de contacto</span>
+            </div>
+          </div>
+          <div class="cotiz-step">
+            <div class="cotiz-step-num">2</div>
+            <div class="cotiz-step-text">
+              <strong>Te enviamos cotización</strong>
+              <span>En menos de 24 horas, detallada con precios y opciones</span>
+            </div>
+          </div>
+          <div class="cotiz-step">
+            <div class="cotiz-step-num">3</div>
+            <div class="cotiz-step-text">
+              <strong>Confirmas y coordinamos</strong>
+              <span>Acordamos plazo de entrega, instalación y forma de pago</span>
+            </div>
+          </div>
+        </div>
+        <div class="cotiz-guarantee">
+          <div class="cotiz-guarantee-icon">🤝</div>
+          <div class="cotiz-guarantee-text">
+            <strong>Sin compromiso de compra</strong>
+            <span>La cotización es completamente gratis. Decides tú.</span>
+          </div>
+        </div>
+        <div class="cotiz-guarantee">
+          <div class="cotiz-guarantee-icon">💳</div>
+          <div class="cotiz-guarantee-text">
+            <strong>Pago en cuotas disponible</strong>
+            <span>Financiamiento directo, sin banco ni tarjeta de crédito.</span>
+          </div>
+        </div>
+        <div class="cotiz-guarantee">
+          <div class="cotiz-guarantee-icon">🚚</div>
+          <div class="cotiz-guarantee-text">
+            <strong>Despacho a todo Chile</strong>
+            <span>Enviamos e instalamos en tu región.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: formulario -->
+      <div class="cotiz-form-card">
+        <div class="cotiz-form-title">Solicitar cotización</div>
+
+        <form id="cotiz-form" onsubmit="sendCotizacion(event)">
+
+          <!-- Nombre + Email -->
+          <div class="cotiz-row">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Nombre completo *</label>
+              <input class="cotiz-input" type="text" id="cq-name" placeholder="Tu nombre" required>
+            </div>
+            <div class="cotiz-group">
+              <label class="cotiz-label">Email *</label>
+              <input class="cotiz-input" type="email" id="cq-email" placeholder="tu@email.com" required>
+            </div>
+          </div>
+
+          <!-- Teléfono + Tipo cliente -->
+          <div class="cotiz-row">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Teléfono / WhatsApp</label>
+              <input class="cotiz-input" type="tel" id="cq-phone" placeholder="+56 9 XXXX XXXX">
+            </div>
+            <div class="cotiz-group">
+              <label class="cotiz-label">¿Para quién es?</label>
+              <select class="cotiz-select" id="cq-tipo">
+                <option value="Colegio o academia">Colegio o academia</option>
+                <option value="Club deportivo">Club deportivo</option>
+                <option value="Municipalidad">Municipalidad</option>
+                <option value="Empresa / corporativo">Empresa / corporativo</option>
+                <option value="Uso personal">Uso personal</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Productos de interés -->
+          <div class="cotiz-row full" style="margin-bottom:8px">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Productos de interés (selecciona uno o más)</label>
+            </div>
+          </div>
+          <div class="cotiz-products-grid" style="margin-bottom:14px" id="cotiz-checks">
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Arcos de fútbol"> 🥅 Arcos de fútbol
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Tableros de básquetbol"> 🏀 Tableros básquetbol
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Parantes de voleibol"> 🏐 Parantes voleibol
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Taca taca"> 🎯 Taca taca
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Mesa de ping pong"> 🏓 Mesa ping pong
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Set escolar completo"> 🏟️ Set escolar completo
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Redes y accesorios"> 🕸️ Redes y accesorios
+            </label>
+            <label class="cotiz-product-check" onclick="toggleCheck(this)">
+              <input type="checkbox" value="Otro / no sé aún"> ❓ Otro / no sé aún
+            </label>
+          </div>
+
+          <!-- Cantidad + Región -->
+          <div class="cotiz-row">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Cantidad aproximada</label>
+              <select class="cotiz-select" id="cq-qty">
+                <option value="1 unidad">1 unidad</option>
+                <option value="2 a 5 unidades">2 a 5 unidades</option>
+                <option value="6 a 10 unidades">6 a 10 unidades</option>
+                <option value="Más de 10 unidades">Más de 10 unidades</option>
+                <option value="No lo sé aún">No lo sé aún</option>
+              </select>
+            </div>
+            <div class="cotiz-group">
+              <label class="cotiz-label">Región de entrega</label>
+              <select class="cotiz-select" id="cq-region">
+                <option value="Metropolitana">Metropolitana (RM)</option>
+                <option value="Valparaíso">Valparaíso</option>
+                <option value="Biobío">Biobío</option>
+                <option value="Araucanía">Araucanía</option>
+                <option value="Los Lagos">Los Lagos</option>
+                <option value="O'Higgins">O'Higgins</option>
+                <option value="Maule">Maule</option>
+                <option value="Antofagasta">Antofagasta</option>
+                <option value="Atacama">Atacama</option>
+                <option value="Coquimbo">Coquimbo</option>
+                <option value="Tarapacá">Tarapacá</option>
+                <option value="Arica y Parinacota">Arica y Parinacota</option>
+                <option value="Los Ríos">Los Ríos</option>
+                <option value="Aysén">Aysén</option>
+                <option value="Magallanes">Magallanes</option>
+                <option value="Ñuble">Ñuble</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Mensaje -->
+          <div class="cotiz-row full">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Cuéntanos más (opcional)</label>
+              <textarea class="cotiz-textarea" id="cq-msg" placeholder="Medidas especiales, fechas, presupuesto, instalación, cualquier detalle que nos ayude a cotizar mejor..."></textarea>
+            </div>
+          </div>
+
+          <button type="submit" class="cotiz-submit" id="cotiz-btn">Enviar solicitud de cotización →</button>
+          <p class="cotiz-note">🔒 Tu información es privada. Te respondemos en menos de 24 horas.</p>
+        </form>
+
+        <!-- Éxito -->
+        <div class="cotiz-success" id="cotiz-success">
+          <div class="cotiz-success-icon">✅</div>
+          <div class="cotiz-success-title">¡Solicitud enviada!</div>
+          <div style="display:inline-block; background:var(--blue-light); border:1px solid var(--blue); border-radius:8px; padding:8px 18px; margin:10px 0 16px; font-family:var(--font-display); font-weight:900; color:var(--blue); font-size:15px; letter-spacing:0.08em;" id="cotiz-success-num">COT-2026-XXX</div>
+          <p class="cotiz-success-sub">Tu solicitud quedó registrada con ese número. Te enviamos la cotización formal a tu email en menos de 24 horas hábiles.<br><br>Si necesitas respuesta urgente, escríbenos por WhatsApp.</p>
+          <br>
+          <a href="https://wa.me/56964329683?text=Hola!%20Acabo%20de%20enviar%20una%20solicitud%20de%20cotización%20por%20la%20web." target="_blank" class="btn-primary" style="display:inline-flex; padding:12px 24px;">💬 WhatsApp directo</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div><!-- end .page -->
+<!-- ─── CART DRAWER ─── -->
+<div class="cart-overlay" id="cart-overlay">
+  <div class="cart-drawer">
+    <div class="cart-header">
+      <div class="cart-title">🛒 Mi carrito</div>
+      <button class="cart-close" onclick="closeCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cart-items"></div>
+    <div class="cart-footer" id="cart-footer" style="display:none">
+      <div class="cart-subtotal">
+        <span class="cart-subtotal-label">Subtotal</span>
+        <span class="cart-subtotal-amount" id="cart-subtotal">$0</span>
+      </div>
+      <button class="cart-checkout-btn" onclick="showToast('✅ Redirigiendo a pago...'); closeCart()">Finalizar compra →</button>
+      <button class="cart-continue-btn" onclick="closeCart()">← Seguir comprando</button>
+    </div>
+  </div>
+</div>
+<!-- ─── WHATSAPP FLOTANTE ─── -->
+<a class="wa-float" href="https://wa.me/56900000000?text=Hola%20Athlix%20Store!%20Me%20interesa%20un%20producto%20%F0%9F%8F%86" target="_blank" rel="noopener">
+  💬
+  <span class="wa-tooltip">¡Escríbenos!</span>
+</a>
+<!-- ─── MODAL PAGO 50/50 ─── -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-title" id="modal-product-name">Confirmar pedido</div>
+      <div class="modal-subtitle">Elige tu plan de pago y método preferido</div>
+    </div>
+    <!-- Pasos -->
+    <div class="modal-steps">
+      <div class="mstep active" id="mstep1"><div class="mstep-num">1</div> Plan de pago</div>
+      <div class="mstep-sep"></div>
+      <div class="mstep" id="mstep2"><div class="mstep-num">2</div> Método</div>
+      <div class="mstep-sep"></div>
+      <div class="mstep" id="mstep3"><div class="mstep-num">3</div> Confirmar</div>
+    </div>
+    <!-- PASO 1: Plan abono -->
+    <div id="modal-step1">
+      <div style="font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-400); margin-bottom:10px;">Plan de abono</div>
+      <div class="abono-plan-grid">
+        <div class="abono-plan-card selected" onclick="selectPlan(this,'50')">
+          <div class="plan-label">Abono inicial</div>
+          <div class="plan-pct">50%</div>
+          <div class="plan-amount" id="plan-50-amount">$0</div>
+          <div class="plan-desc">Reservas ahora con el 50% y pagas el resto al recibir tu pedido.</div>
+        </div>
+        <div class="abono-plan-card" onclick="selectPlan(this,'30')">
+          <div class="plan-label">Abono inicial</div>
+          <div class="plan-pct">30%</div>
+          <div class="plan-amount" id="plan-30-amount">$0</div>
+          <div class="plan-desc">Paga el 30% ahora y el 70% restante en cuotas acordadas.</div>
+        </div>
+      </div>
+      <div class="modal-summary" id="modal-summary-step1">
+        <div class="summary-row"><span>Producto</span><span id="s1-product">—</span></div>
+        <div class="summary-row"><span>Precio total</span><span id="s1-total">—</span></div>
+        <div class="summary-row highlight"><span id="s1-abono-label">Abono hoy (50%)</span><span id="s1-abono">—</span></div>
+        <div class="summary-row"><span id="s1-resto-label">Saldo al entregar (50%)</span><span id="s1-resto">—</span></div>
+      </div>
+      <button class="modal-btn-confirm" onclick="goModalStep(2)">Continuar → Elegir método de pago</button>
+    </div>
+    <!-- PASO 2: Método de pago -->
+    <div id="modal-step2" style="display:none">
+      <div style="font-size:12px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--gray-400); margin-bottom:10px;">Pagar abono con</div>
+      <div class="payment-methods-grid">
+        <button class="pay-method-btn selected" onclick="selectMethod(this,'flow')">
+          <span class="pay-method-icon">💳</span>
+          <span><span class="pay-method-name">Flow</span><span class="pay-method-sub">Tarjeta / Débito</span></span>
+        </button>
+        <button class="pay-method-btn" onclick="selectMethod(this,'mercadopago')">
+          <span class="pay-method-icon">🛒</span>
+          <span><span class="pay-method-name">MercadoPago</span><span class="pay-method-sub">Tarjeta / Efectivo</span></span>
+        </button>
+        <button class="pay-method-btn" onclick="selectMethod(this,'transferencia')">
+          <span class="pay-method-icon">🏦</span>
+          <span><span class="pay-method-name">Transferencia</span><span class="pay-method-sub">Banco directo</span></span>
+        </button>
+        <button class="pay-method-btn" onclick="selectMethod(this,'webpay')">
+          <span class="pay-method-icon">🔐</span>
+          <span><span class="pay-method-name">WebPay Plus</span><span class="pay-method-sub">Transbank</span></span>
+        </button>
+      </div>
+      <div class="modal-notice">
+        ⚠️ <strong>Nota importante:</strong> Al confirmar, serás redirigido a la pasarela de pago seleccionada para completar el abono. Una vez acreditado, Athlix Store se contactará para coordinar despacho.
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="goModalStep(1)" style="flex:1; padding:13px; border-radius:10px; border:1px solid var(--gray-200); background:var(--white); color:var(--text); font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font-body);">← Volver</button>
+        <button class="modal-btn-confirm" style="flex:2" onclick="goModalStep(3)">Revisar pedido →</button>
+      </div>
+    </div>
+    <!-- PASO 3: Confirmación -->
+    <div id="modal-step3" style="display:none">
+      <div class="modal-summary" style="margin-bottom:1rem">
+        <div class="summary-row"><span>Producto</span><span id="s3-product">—</span></div>
+        <div class="summary-row"><span>Plan</span><span id="s3-plan">50% hoy + 50% entrega</span></div>
+        <div class="summary-row"><span>Método</span><span id="s3-method">Flow</span></div>
+        <div class="summary-row total highlight"><span>Pagas ahora</span><span id="s3-abono">—</span></div>
+        <div class="summary-row"><span>Saldo pendiente</span><span id="s3-resto">—</span></div>
+      </div>
+      <div style="background:#0a2200; border:1px solid #2a5c00; border-radius:8px; padding:10px 14px; font-size:12px; color:#7ddd55; margin-bottom:1rem; line-height:1.5;">
+        ✅ Al confirmar recibirás un <strong>correo de confirmación</strong> con los detalles del pedido y el link de pago del abono.
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button onclick="goModalStep(2)" style="flex:1; padding:13px; border-radius:10px; border:1.5px solid var(--gray-200); background:white; font-size:14px; font-weight:600; cursor:pointer; font-family:var(--font-body);">← Volver</button>
+        <button class="modal-btn-confirm" style="flex:2" onclick="confirmOrder()">✅ Confirmar y pagar abono</button>
+      </div>
+      <p style="text-align:center; font-size:11px; color:var(--gray-400); margin-top:10px;">🔒 Pago seguro · SSL · Datos protegidos</p>
+    </div>
+  </div>
+</div>
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">ATHLIX <span>STORE</span></div>
+        <div class="footer-tagline">Equipamos espacios deportivos completos. Colegios, clubes y municipios en todo Chile.</div>
+        <div class="footer-social">
+          <a class="social-btn" href="#" title="Instagram">📷</a>
+          <a class="social-btn" href="#" title="Facebook">👍</a>
+          <a class="social-btn" href="#" title="TikTok">🎵</a>
+          <a class="social-btn" href="#" title="WhatsApp">💬</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Tienda</div>
+        <div class="footer-links">
+          <a href="#" onclick="showSection('catalog')">Catálogo completo</a>
+          <a href="#" onclick="filterCatalog('Fútbol')">Fútbol</a>
+          <a href="#" onclick="filterCatalog('Básquetbol')">Básquetbol</a>
+          <a href="#" onclick="filterCatalog('Voleibol')">Voleibol</a>
+          <a href="#" onclick="filterCatalog('Taca Taca')">Taca Taca</a>
+          <a href="#" onclick="filterCatalog('Otros deportes')">Otros deportes</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Empresa</div>
+        <div class="footer-links">
+          <a href="#" onclick="showSection('about')">Sobre nosotros</a>
+          <a href="#" onclick="showSection('contact')">Contacto</a>
+          <a href="#">Trabaja con nosotros</a>
+          <a href="#">Cotización masiva</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Ayuda</div>
+        <div class="footer-links">
+          <a href="#">Cómo comprar</a>
+          <a href="#">Pago en abonos</a>
+          <a href="#">Envíos y plazos</a>
+          <a href="#">Cambios y devoluciones</a>
+          <a href="#">Preguntas frecuentes</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Athlix Store. Todos los derechos reservados.</div>
+      <div class="footer-methods">
+        <div class="payment-method">Transferencia</div>
+        <div class="payment-method">WebPay</div>
+        <div class="payment-method">Débito</div>
+        <div class="payment-method">Crédito</div>
+        <div class="payment-method">Abonos</div>
+      </div>
+    </div>
+  </div>
+</footer>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+<script>
+// ════════════════════════════════════════════════════════════════
+// CONFIGURACIÓN SUPABASE — Pega aquí los datos de tu proyecto
+// ════════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'PEGA_TU_URL_AQUI';   // Ej: https://xyzabc.supabase.co
+const SUPABASE_KEY = 'PEGA_TU_CLAVE_AQUI'; // Clave "anon public" de Supabase
+// ════════════════════════════════════════════════════════════════
+
+// Productos de respaldo (se usan si Supabase no está configurado)
+const localProducts = [
+  { id:1,  name:'Arco de Fútbol Metálico 3,00×2,00 mts', brand:'Athlix', sport:'Fútbol',         price:359990, oldPrice:399900,  img:'Productos/arco_3x2_dospulgadas.png',    emoji:'🥅', badge:'Oferta',    badgeType:'',     tags:['Acero galvanizado','Desmontable'],     abono:'Desde $200.000/abono', desc:'Arco de fútbol en tubo galvanizado calibre 2". Medidas 3.00×2.00 mts. Desmontable. Red incluida.',          inStock:true },
+  { id:2,  name:'Arco de Fútbol Baby-fútbol 3×2 m',      brand:'Athlix', sport:'Fútbol',         price:89000,  oldPrice:null,    img:null,                                    emoji:'⚽', badge:'Nuevo',     badgeType:'blue', tags:['Tubo 1.25"','Red incluida'],          abono:'Desde $29.700/abono',  desc:'Arco de baby-fútbol en estructura metálica resistente. Red incluida.',                                       inStock:true },
+  { id:3,  name:'Tablero Básquetbol Profesional',         brand:'Athlix', sport:'Básquetbol',     price:189000, oldPrice:225000,  img:null,                                    emoji:'🏀', badge:'Destacado', badgeType:'blue', tags:['Altura regulable','Acero'],            abono:'Desde $63.000/abono',  desc:'Tablero de básquetbol en acero galvanizado. Altura regulable 2.4–3.05 m. Base con contrapeso.',             inStock:true },
+  { id:4,  name:'Parantes de Voleibol con Red',           brand:'Athlix', sport:'Voleibol',       price:124000, oldPrice:null,    img:null,                                    emoji:'🏐', badge:null,        badgeType:'',     tags:['Reglamentario','Set completo'],        abono:'Desde $41.300/abono',  desc:'Set de parantes de voleibol en acero. Red FIVB incluida. Tensor de acero trenzado.',                        inStock:true },
+  { id:5,  name:'Taca Taca Madera Premium',               brand:'Athlix', sport:'Taca Taca',      price:149000, oldPrice:185000,  img:'Productos/tacatacafichero0730.jpg',      emoji:'🎯', badge:'Oferta',    badgeType:'',     tags:['Doble tornamesa','MDF + vidrio'],      abono:'Desde $49.700/abono',  desc:'Mesa de taca-taca en MDF con vidrio templado. 8 jugadores. 2 balones incluidos.',                           inStock:true },
+  { id:6,  name:'Taca Taca Escolar Básico',               brand:'Athlix', sport:'Taca Taca',      price:99000,  oldPrice:null,    img:null,                                    emoji:'🎯', badge:'Nuevo',     badgeType:'green',tags:['Uso intensivo','MDF reforzado'],        abono:'Desde $33.000/abono',  desc:'Mesa de taca-taca para uso escolar intensivo.',                                                              inStock:true },
+  { id:7,  name:'Red de Voleibol Reglamentaria',          brand:'Athlix', sport:'Voleibol',       price:32900,  oldPrice:null,    img:null,                                    emoji:'🕸️',badge:null,        badgeType:'',     tags:['FIVB','Antenas incluidas'],            abono:'Desde $11.000/abono',  desc:'Red oficial de voleibol con antenas laterales. Medidas FIVB.',                                              inStock:true },
+  { id:8,  name:'Arco de Fútbol Portátil PVC',            brand:'Athlix', sport:'Fútbol',         price:49000,  oldPrice:62000,   img:null,                                    emoji:'🥅', badge:'Oferta',    badgeType:'',     tags:['PVC resistente','Liviano'],            abono:'Desde $16.300/abono',  desc:'Arco portátil en PVC de alta resistencia. Armado sin herramientas.',                                        inStock:true },
+  { id:9,  name:'Canasta Básquetbol Mural',               brand:'Athlix', sport:'Básquetbol',     price:69000,  oldPrice:85000,   img:null,                                    emoji:'🏀', badge:'Oferta',    badgeType:'',     tags:['Montaje en muro','Tablero incluido'],  abono:'Desde $23.000/abono',  desc:'Canasta de básquetbol para montaje en muro o poste. Tablero de melamina.',                                  inStock:true },
+  { id:10, name:'Set Deportivo Escolar Completo',          brand:'Athlix', sport:'Fútbol',         price:390000, oldPrice:480000,  img:null,                                    emoji:'🏟️',badge:'Pack',      badgeType:'blue', tags:['Todo incluido','Colegios'],            abono:'Desde $130.000/abono', desc:'Pack: 2 arcos + tablero básquetbol + parantes de voleibol. Precio institucional.',                          inStock:true },
+  { id:11, name:'Aro de Básquetbol con Poste',            brand:'Athlix', sport:'Básquetbol',     price:95000,  oldPrice:null,    img:null,                                    emoji:'🏀', badge:'Nuevo',     badgeType:'green',tags:['Poste incluido','Exterior'],           abono:'Desde $31.700/abono',  desc:'Aro de básquetbol con poste de acero 3 m. Red incluida.',                                                   inStock:true },
+  { id:12, name:'Parante de Arco Baby-fútbol',            brand:'Athlix', sport:'Otros deportes', price:45000,  oldPrice:55000,   img:null,                                    emoji:'🏅', badge:'Oferta',    badgeType:'',     tags:['Metálico','Par'],                      abono:'Desde $15.000/abono',  desc:'Par de parantes metálicos para baby-fútbol. Compatible con pasto o cemento.',                               inStock:true },
+  { id:13, name:'Mesa de Ping Pong Profesional',          brand:'Athlix', sport:'Otros deportes', price:189000, oldPrice:229000,  img:'Productos/2000371017926_2.jpg',          emoji:'🏓', badge:'Oferta',    badgeType:'',     tags:['Plegable','Interior y exterior'],      abono:'Desde $63.000/abono',  desc:'Mesa de ping pong plegable con ruedas. Red incluida. Ideal para colegios y clubes.',                        inStock:true },
+];
+
+// Normaliza filas de Supabase al formato que usa la página
+function normalize(row) {
+  return {
+    id:        row.id,
+    name:      row.name,
+    brand:     row.brand || 'Athlix',
+    sport:     row.sport,
+    price:     row.price,
+    oldPrice:  row.old_price || null,
+    img:       row.img_url   || null,
+    emoji:     row.emoji     || '🏅',
+    badge:     row.badge     || null,
+    badgeType: row.badge_type|| '',
+    tags:      Array.isArray(row.tags) ? row.tags : [],
+    abono:     row.abono     || '',
+    desc:      row.description || '',
+    inStock:   row.in_stock !== false,
+  };
+}
+
+let products = [...localProducts];
+
+// Carga productos desde Supabase si está configurado
+async function initProducts() {
+  if (SUPABASE_URL === 'PEGA_TU_URL_AQUI') return;
+  try {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const { data, error } = await sb.from('products').select('*').order('id');
+    if (!error && data && data.length > 0) {
+      products = data.filter(p => p.in_stock !== false).map(normalize);
+      renderCatalog(products);
+      const fg = document.getElementById('featured-grid');
+      if (fg) fg.innerHTML = products.slice(0,4).map((p,i) => productCard(p, i%2===1)).join('');
+    }
+  } catch(e) {
+    console.warn('Supabase no disponible, usando datos locales.');
+  }
+}
+// Inicia carga desde Supabase en segundo plano
+initProducts();
+
+// ════════════════════════════════════════════════════════════════
+// EMAILJS — Configura aquí para recibir cotizaciones en tu correo
+// ════════════════════════════════════════════════════════════════
+// 1. Ve a emailjs.com → crea cuenta gratis con athlixchile@gmail.com
+// 2. Crea un "Email Service" conectado a Gmail
+// 3. Crea un "Email Template" (ver instrucciones en GUIA_CORREO.md)
+// 4. Pega los 3 valores aquí abajo:
+const EMAILJS_PUBLIC_KEY  = 'PEGA_TU_PUBLIC_KEY';   // Account → API Keys
+const EMAILJS_SERVICE_ID  = 'PEGA_TU_SERVICE_ID';   // Email Services → Service ID
+const EMAILJS_TEMPLATE_ID = 'PEGA_TU_TEMPLATE_ID';  // Email Templates → Template ID
+// ════════════════════════════════════════════════════════════════
+
+// Inicializar EmailJS
+if (EMAILJS_PUBLIC_KEY !== 'PEGA_TU_PUBLIC_KEY') {
+  emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+}
+
+function toggleCheck(label) {
+  label.classList.toggle('checked');
+}
+
+// Genera número de cotización: COT-2026-001
+function genCotNumber() {
+  const year = new Date().getFullYear();
+  const rand = String(Math.floor(Math.random() * 900) + 100);
+  return `COT-${year}-${rand}`;
+}
+
+async function sendCotizacion(e) {
+  e.preventDefault();
+  const btn = document.getElementById('cotiz-btn');
+
+  const checked = [...document.querySelectorAll('#cotiz-checks input:checked')].map(i => i.value);
+  if (checked.length === 0) { showToast('Selecciona al menos un producto', true); return; }
+
+  const name     = document.getElementById('cq-name').value.trim();
+  const email    = document.getElementById('cq-email').value.trim();
+  const phone    = document.getElementById('cq-phone').value.trim() || 'No indicado';
+  const tipo     = document.getElementById('cq-tipo').value;
+  const cantidad = document.getElementById('cq-qty').value;
+  const region   = document.getElementById('cq-region').value;
+  const mensaje  = document.getElementById('cq-msg').value.trim() || 'Sin comentarios adicionales';
+  const cotNum   = genCotNumber();
+
+  const emailParams = {
+    cot_number:  cotNum,
+    from_name:   name,
+    from_email:  email,
+    phone,
+    tipo,
+    productos:   checked.join(', '),
+    cantidad,
+    region,
+    mensaje,
+    to_email:    'athlixchile@gmail.com',
+  };
+
+  btn.disabled    = true;
+  btn.textContent = 'Enviando...';
+
+  // 1. Guardar en Supabase
+  if (SUPABASE_URL !== 'PEGA_TU_URL_AQUI') {
+    try {
+      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      await sb.from('quotations').insert({
+        cot_number:        cotNum,
+        status:            'pendiente',
+        client_name:       name,
+        client_email:      email,
+        client_phone:      phone,
+        client_type:       tipo,
+        products_interest: checked.join(', '),
+        quantity_approx:   cantidad,
+        region:            region,
+        message:           mensaje,
+      });
+    } catch(err) {
+      console.warn('No se pudo guardar en Supabase:', err.message);
+    }
+  }
+
+  // 2. Enviar email via EmailJS
+  if (EMAILJS_PUBLIC_KEY === 'PEGA_TU_PUBLIC_KEY') {
+    console.log('EmailJS no configurado. Datos:', emailParams);
+    setTimeout(() => showSuccess(cotNum), 800);
+    return;
+  }
+
+  try {
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams);
+    showSuccess(cotNum);
+  } catch(err) {
+    showToast('Error al enviar. Intenta por WhatsApp.', true);
+    btn.disabled    = false;
+    btn.textContent = 'Enviar solicitud de cotización →';
+  }
+}
+
+function showSuccess(cotNum) {
+  document.getElementById('cotiz-form').style.display   = 'none';
+  const suc = document.getElementById('cotiz-success');
+  suc.style.display = 'block';
+  if (cotNum) {
+    const numEl = document.getElementById('cotiz-success-num');
+    if (numEl) numEl.textContent = cotNum;
+  }
+}
+
+let cartCount = 0;
+// ─── NAVIGATION ───
+function showSection(name) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (name === 'catalog') renderCatalog(products);
+}
+function setActive(el) {
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  el.classList.add('active');
+}
+// ─── MARQUEE ───
+const marqueeItems = ['🥅 Arcos de fútbol','🏀 Tableros de básquetbol','🏐 Parantes de voleibol','🎯 Taca taca','📐 Fabricación a medida','🚚 Despacho a todo Chile','💳 Pago en cuotas','🏫 Colegios · Municipios · Clubes'];
+const marqueeTrack = document.getElementById('marquee');
+const doubled = [...marqueeItems, ...marqueeItems];
+marqueeTrack.innerHTML = doubled.map(item => `<span class="marquee-item">${item}<span class="marquee-dot"></span></span>`).join('');
+// ─── PRODUCT CARD ───
+function productCard(p, dark = false) {
+  const inStock  = p.inStock !== false;
+  const imgHtml  = p.img
+    ? `<img src="${p.img}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const emojiHtml = `<span style="${p.img ? 'display:none' : ''}">${p.emoji}</span>`;
+  const stockOverlay = !inStock ? `<div class="badge-sin-stock">Sin stock</div>` : '';
+  return `
+    <div class="product-card ${dark ? 'dark-card' : ''}" onclick="showDetail(${p.id})">
+      <div class="product-img">
+        ${imgHtml}${emojiHtml}
+        ${p.badge && inStock ? `<div class="product-badge ${p.badgeType || ''}">${p.badge}</div>` : ''}
+        ${stockOverlay}
+        <div class="product-wishlist" onclick="event.stopPropagation(); addWish(this)">♡</div>
+      </div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand} · ${p.sport}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-tags">${p.tags.map(t => `<span class="product-tag">${t}</span>`).join('')}</div>
+        <div class="product-footer">
+          <div class="product-price">
+            ${p.oldPrice ? `<div class="price-old">$${p.oldPrice.toLocaleString('es-CL')}</div>` : ''}
+            <div class="price-main">$${p.price.toLocaleString('es-CL')}</div>
+            <div class="price-abono">💳 ${p.abono}</div>
+          </div>
+          <button class="add-to-cart" onclick="event.stopPropagation(); addCart(${p.id})" ${!inStock ? 'disabled' : ''}>+</button>
+        </div>
+      </div>
+    </div>`;
+}
+// ─── RENDER FEATURED ───
+const featuredGrid = document.getElementById('featured-grid');
+if (featuredGrid) featuredGrid.innerHTML = products.slice(0,4).map((p,i) => productCard(p, i%2===1)).join('');
+// ─── RENDER CATALOG ───
+function renderCatalog(list) {
+  const grid = document.getElementById('catalog-grid');
+  document.getElementById('result-num').textContent = list.length;
+  grid.innerHTML = list.map(p => productCard(p)).join('') || '<div style="grid-column:1/-1; padding:40px; text-align:center; color:var(--gray-400)">No se encontraron productos con esos filtros.</div>';
+}
+function filterCatalog(sport) {
+  showSection('catalog');
+  setActive(document.querySelectorAll('.nav-links a')[1]);
+  const checkboxes = document.querySelectorAll('#sport-filters input');
+  checkboxes.forEach(c => { c.checked = c.value === sport; });
+  applyFilters();
+}
+function applyFilters() {
+  const checked = [...document.querySelectorAll('#sport-filters input:checked')].map(c => c.value);
+  const minP = parseInt(document.getElementById('price-min')?.value) || 0;
+  const maxP = parseInt(document.getElementById('price-max')?.value) || Infinity;
+  let filtered = products.filter(p => {
+    if (checked.length && !checked.includes(p.sport)) return false;
+    if (p.price < minP || p.price > maxP) return false;
+    return true;
+  });
+  renderCatalog(filtered);
+  // Active filter tags
+  const display = document.getElementById('active-filters-display');
+  display.innerHTML = checked.map(s => `<div class="active-filter" onclick="removeFilter('${s}')">${s} ✕</div>`).join('');
+}
+function removeFilter(sport) {
+  const cb = document.querySelector(`#sport-filters input[value="${sport}"]`);
+  if (cb) { cb.checked = false; applyFilters(); }
+}
+function clearFilters() {
+  document.querySelectorAll('#sport-filters input, #catalog input[type=checkbox]').forEach(c => c.checked = false);
+  document.getElementById('price-min').value = '';
+  document.getElementById('price-max').value = '';
+  applyFilters();
+}
+// ─── PRODUCT DETAIL ───
+function showDetail(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const related = products.filter(x => x.sport === p.sport && x.id !== p.id).slice(0,4);
+  document.getElementById('detail-content').innerHTML = `
+    <div>
+      <div class="detail-gallery-main">${p.emoji}</div>
+      <div class="detail-gallery-thumbs">
+        <div class="thumb active">${p.emoji}</div>
+        <div class="thumb">📦</div>
+        <div class="thumb">🔍</div>
+      </div>
+    </div>
+    <div>
+      <div class="detail-breadcrumb">
+        <a href="#" onclick="showSection('home')" style="color:var(--blue)">Inicio</a> /
+        <a href="#" onclick="filterCatalog('${p.sport}')" style="color:var(--blue)">${p.sport}</a> /
+        <span>${p.name}</span>
+      </div>
+      <div class="detail-brand">${p.brand} · ${p.sport}</div>
+      <h1 class="detail-title">${p.name}</h1>
+      <div class="detail-rating">
+        <div class="stars">★★★★★</div>
+        <div class="rating-count">4.9 (127 reseñas)</div>
+      </div>
+      <div class="detail-price">
+        ${p.oldPrice ? `<div style="font-size:14px; color:var(--gray-400); text-decoration:line-through">$${p.oldPrice.toLocaleString('es-CL')}</div>` : ''}
+        <div class="price-big">$${p.price.toLocaleString('es-CL')}</div>
+        <div class="price-desc" style="color:var(--gray-400); margin-top:4px">IVA incluido · Envío gratis a todo Chile</div>
+      </div>
+      <div class="abono-info-box">
+        <div class="abono-icon">💳</div>
+        <div class="abono-text"><strong>Pago en abonos disponible.</strong><br>${p.abono} · Sin intereses · Cuotas a convenir</div>
+      </div>
+      <div class="detail-section-title">Talla</div>
+      <div class="talla-grid">
+        <button class="talla-btn" onclick="selectTalla(this)">XS</button>
+        <button class="talla-btn active" onclick="selectTalla(this)">S</button>
+        <button class="talla-btn" onclick="selectTalla(this)">M</button>
+        <button class="talla-btn" onclick="selectTalla(this)">L</button>
+        <button class="talla-btn" onclick="selectTalla(this)">XL</button>
+        <button class="talla-btn unavailable">XXL</button>
+      </div>
+      <div class="detail-section-title">Color</div>
+      <div class="color-grid">
+        <div class="color-swatch active" style="background:#0057FF" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#0a0a0a" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#00C851" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#FF3B30" onclick="selectColor(this)"></div>
+        <div class="color-swatch" style="background:#ffffff; border: 1.5px solid var(--gray-200)" onclick="selectColor(this)"></div>
+      </div>
+      <div class="detail-section-title">Cantidad</div>
+      <div class="qty-control">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-num" id="qty-num">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+        <span style="font-size:13px; color:var(--gray-400)">Stock disponible</span>
+      </div>
+      <div class="detail-ctas">
+        <button class="btn-primary" onclick="openPaymentModal(${p.id})">💳 Comprar con abono</button>
+        <button class="btn-wish" onclick="addWish(this)">♡</button>
+      </div>
+      <div class="detail-features">
+        <div class="detail-feat"><span class="feat-icon">🚚</span>Envío gratis</div>
+        <div class="detail-feat"><span class="feat-icon">🔄</span>30 días cambios</div>
+        <div class="detail-feat"><span class="feat-icon">🏷️</span>Precio garantizado</div>
+        <div class="detail-feat"><span class="feat-icon">💳</span>Pago en cuotas</div>
+      </div>
+      <div style="background:var(--gray-100); border-radius:var(--radius-sm); padding:16px; font-size:14px; line-height:1.7; color:var(--gray-600)">
+        <strong style="color:var(--black); display:block; margin-bottom:6px">Descripción</strong>
+        ${p.desc}
+      </div>
+    </div>`;
+  showSection('detail');
+  setActive(document.querySelectorAll('.nav-links a')[1]);
+}
+let qty = 1;
+function changeQty(d) {
+  qty = Math.max(1, qty + d);
+  const el = document.getElementById('qty-num');
+  if (el) el.textContent = qty;
+}
+function selectTalla(btn) {
+  if (btn.classList.contains('unavailable')) return;
+  btn.closest('.talla-grid').querySelectorAll('.talla-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function selectColor(swatch) {
+  swatch.closest('.color-grid').querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+  swatch.classList.add('active');
+}
+// ─── CART ───
+let cart = [];
+
+function openCart() {
+  renderCart();
+  document.getElementById('cart-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('cart-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeCart();
+});
+
+function addCart(productId) {
+  const p = products.find(x => x.id === productId);
+  if (!p) return;
+  const existing = cart.find(item => item.product.id === productId);
+  if (existing) { existing.qty++; }
+  else { cart.push({ product: p, qty: 1 }); }
+  updateCartBadge();
+  renderCart();
+  const shortName = p.name.length > 26 ? p.name.substring(0,26)+'...' : p.name;
+  showToast('✅ ' + shortName + ' agregado');
+}
+
+function removeFromCart(productId) {
+  cart = cart.filter(item => item.product.id !== productId);
+  updateCartBadge();
+  renderCart();
+}
+
+function updateCartQty(productId, delta) {
+  const item = cart.find(i => i.product.id === productId);
+  if (!item) return;
+  item.qty = Math.max(0, item.qty + delta);
+  if (item.qty === 0) removeFromCart(productId);
+  else { updateCartBadge(); renderCart(); }
+}
+
+function updateCartBadge() {
+  const total = cart.reduce((sum, item) => sum + item.qty, 0);
+  document.querySelector('.cart-badge').textContent = total;
+}
+
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  const footer = document.getElementById('cart-footer');
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <div class="cart-empty-text">Tu carrito está vacío.<br>¡Agrega productos para comenzar!</div>
+    </div>`;
+    footer.style.display = 'none';
+    return;
+  }
+  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.qty, 0);
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-emoji">${item.product.emoji}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.product.name}</div>
+        <div class="cart-item-price">$${(item.product.price * item.qty).toLocaleString('es-CL')}</div>
+      </div>
+      <div class="cart-item-controls">
+        <button class="cart-qty-btn" onclick="updateCartQty(${item.product.id},-1)">−</button>
+        <div class="cart-qty-num">${item.qty}</div>
+        <button class="cart-qty-btn" onclick="updateCartQty(${item.product.id},1)">+</button>
+        <button class="cart-item-remove" onclick="removeFromCart(${item.product.id})">✕</button>
+      </div>
+    </div>`).join('');
+  document.getElementById('cart-subtotal').textContent = '$' + subtotal.toLocaleString('es-CL');
+  footer.style.display = 'block';
+}
+
+// ─── WISH ───
+function addWish(el) {
+  el.textContent = el.textContent === '♡' ? '♥' : '♡';
+  if (el.textContent === '♥') el.style.color = '#FF3B30';
+  else el.style.color = '';
+}
+// ─── TOAST ───
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+// ─── FORMSPREE ───
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('form-submit-btn');
+  btn.textContent = 'Enviando...';
+  btn.disabled = true;
+  const form = document.getElementById('contact-form');
+  const data = new FormData(form);
+  try {
+    const res = await fetch(form.action, {
+      method: 'POST', body: data,
+      headers: { 'Accept': 'application/json' }
+    });
+    if (res.ok) {
+      form.style.display = 'none';
+      document.getElementById('form-success').style.display = 'block';
+    } else {
+      btn.textContent = 'Error — intenta de nuevo';
+      btn.disabled = false;
+    }
+  } catch {
+    // Si YOUR_FORM_ID no ha sido reemplazado, simulamos éxito en preview
+    form.style.display = 'none';
+    document.getElementById('form-success').style.display = 'block';
+  }
+}
+// ─── PAYMENT MODAL ───
+let currentProduct = null;
+let selectedPlan = '50';
+let selectedMethod = 'flow';
+const methodLabels = { flow:'Flow (Tarjeta/Débito)', mercadopago:'MercadoPago', transferencia:'Transferencia bancaria', webpay:'WebPay Plus' };
+function openPaymentModal(productId) {
+  currentProduct = products.find(p => p.id === productId);
+  if (!currentProduct) return;
+  selectedPlan = '50'; selectedMethod = 'flow';
+  document.getElementById('modal-product-name').textContent = currentProduct.name;
+  updateModalSummary();
+  goModalStep(1);
+  document.getElementById('payment-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('payment-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('payment-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+function updateModalSummary() {
+  if (!currentProduct) return;
+  const price = currentProduct.price;
+  const pct = parseInt(selectedPlan);
+  const abono = Math.round(price * pct / 100);
+  const resto = price - abono;
+  const fmt = v => '$' + v.toLocaleString('es-CL');
+  // Step 1
+  document.getElementById('plan-50-amount').textContent = fmt(Math.round(price * 0.5));
+  document.getElementById('plan-30-amount').textContent = fmt(Math.round(price * 0.3));
+  document.getElementById('s1-product').textContent = currentProduct.name.substring(0,22)+'...';
+  document.getElementById('s1-total').textContent = fmt(price);
+  document.getElementById('s1-abono-label').textContent = `Abono hoy (${pct}%)`;
+  document.getElementById('s1-abono').textContent = fmt(abono);
+  document.getElementById('s1-resto-label').textContent = `Saldo al entregar (${100-pct}%)`;
+  document.getElementById('s1-resto').textContent = fmt(resto);
+  // Step 3
+  document.getElementById('s3-product').textContent = currentProduct.name.substring(0,22)+'...';
+  document.getElementById('s3-plan').textContent = `${pct}% hoy + ${100-pct}% entrega`;
+  document.getElementById('s3-method').textContent = methodLabels[selectedMethod] || selectedMethod;
+  document.getElementById('s3-abono').textContent = fmt(abono);
+  document.getElementById('s3-resto').textContent = fmt(resto);
+}
+function selectPlan(card, pct) {
+  document.querySelectorAll('.abono-plan-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedPlan = pct;
+  updateModalSummary();
+}
+function selectMethod(btn, method) {
+  document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedMethod = method;
+  updateModalSummary();
+}
+function goModalStep(step) {
+  [1,2,3].forEach(i => {
+    document.getElementById(`modal-step${i}`).style.display = i === step ? 'block' : 'none';
+    const ms = document.getElementById(`mstep${i}`);
+    if (ms) ms.classList.toggle('active', i <= step);
+  });
+  if (step === 1) updateModalSummary();
+}
+function confirmOrder() {
+  const price = currentProduct.price;
+  const pct = parseInt(selectedPlan);
+  const abono = Math.round(price * pct / 100);
+  // URLs de pago reales — reemplazar con tus credenciales
+  const urls = {
+    flow: `https://www.flow.cl/app/web/pay.php?amount=${abono}&concept=Abono+Athlix+${encodeURIComponent(currentProduct.name)}`,
+    mercadopago: `https://www.mercadopago.cl/checkout/v1/redirect?pref_id=TU_PREFERENCE_ID`,
+    transferencia: null,
+    webpay: `https://webpay3gint.transbank.cl/webpayserver/initTransaction`
+  };
+  closeModal();
+  if (selectedMethod === 'transferencia') {
+    showToast('🏦 Te enviamos los datos bancarios por WhatsApp/email');
+    setTimeout(() => {
+      alert('Datos de transferencia:\n\nBanco: [Tu banco]\nCuenta corriente: XXXXXXXXX\nRUT: XX.XXX.XXX-X\nNombre: Athlix Store\nEmail: ventas@atlixstore.cl\nMonto: $' + abono.toLocaleString('es-CL') + '\n\nEnvía el comprobante por WhatsApp para coordinar despacho.');
+    }, 400);
+  } else {
+    showToast('🔄 Redirigiendo al pago...');
+    setTimeout(() => {
+      // En producción, descomentar:
+      // window.open(urls[selectedMethod], '_blank');
+      showToast('✅ Demo: En producción se redirige a ' + methodLabels[selectedMethod]);
+    }, 1200);
+  }
+  addCart();
+}
+// ─── INIT ───
+renderCatalog(products);
+</script>
+</body>
+</html>
