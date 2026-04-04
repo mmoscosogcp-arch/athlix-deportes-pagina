@@ -598,8 +598,7 @@
           <div class="field-label" style="margin-bottom:6px">Observaciones</div>
           <textarea id="d-notes" placeholder="Notas internas o para el cliente...">Precios en pesos chilenos (CLP) con IVA incluido.
 Validez: 15 días desde emisión.
-Despacho coordinado según stock.
-Garantía según fabricante.</textarea>
+Despacho coordinado según stock.</textarea>
         </div>
         <div>
           <div class="field-label" style="margin-bottom:6px">Datos de transferencia bancaria</div>
@@ -744,6 +743,7 @@ let editorItems = [];
   if (session) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('main').style.display = 'block';
+    restoreTab();
     loadProducts();
     loadCotizaciones();
     loadClientes();
@@ -768,11 +768,13 @@ async function doLogin() {
   }
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('main').style.display = 'block';
+  restoreTab();
   loadProducts();
   loadCotizaciones();
   loadClientes();
 }
 async function logout() {
+  sessionStorage.removeItem('athlix_admin_tab');
   await sb.auth.signOut();
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('main').style.display = 'none';
@@ -783,11 +785,25 @@ async function logout() {
 // ── Tabs ───────────────────────────────────────────────────────
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
   document.getElementById('detail-panel').style.display = 'none';
   event.target.closest('.tab-btn').classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
   document.getElementById('btn-new-product').style.display = tab === 'productos' ? '' : 'none';
+  sessionStorage.setItem('athlix_admin_tab', tab);
+}
+
+function restoreTab() {
+  const tab = sessionStorage.getItem('athlix_admin_tab') || 'productos';
+  const panel = document.getElementById('panel-' + tab);
+  if (!panel) return;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  panel.classList.add('active');
+  document.getElementById('btn-new-product').style.display = tab === 'productos' ? '' : 'none';
+  // Activar el botón del tab correcto
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(b => { if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${tab}'`)) b.classList.add('active'); });
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1055,7 +1071,7 @@ function openDetail(id) {
   document.getElementById('d-payment').value          = c.payment_condition||'Transferencia / Abonos';
   document.getElementById('d-shipping').value         = c.shipping_info||'Despacho a domicilio';
   document.getElementById('d-valid-days').value       = c.valid_days||15;
-  document.getElementById('d-notes').value            = c.notes||'Precios en pesos chilenos (CLP) con IVA incluido.\nValidez: 15 días desde emisión.\nDespacho coordinado según stock.\nGarantía según fabricante.';
+  document.getElementById('d-notes').value            = c.notes||'Precios en pesos chilenos (CLP) con IVA incluido.\nValidez: 15 días desde emisión.\nDespacho coordinado según stock.';
   document.getElementById('d-bank').value             = c.bank_info||'Banco: \nCuenta Corriente N°: \nRUT empresa: \nATHLIX STORE SpA';
   document.getElementById('t-disc-extra').value       = c.discount_extra||0;
   document.getElementById('t-other').value            = c.other_charges||0;
@@ -1088,9 +1104,15 @@ function buildSuggestedItems(c) {
 }
 
 function backToList() {
-  document.getElementById('detail-panel').style.display='none';
-  document.getElementById('panel-cotizaciones').style.display='block';
+  document.getElementById('detail-panel').style.display = 'none';
+  document.querySelectorAll('.panel').forEach(p => {
+    p.classList.remove('active');
+    p.style.display = '';
+  });
   document.getElementById('panel-cotizaciones').classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-cotiz').classList.add('active');
+  document.getElementById('btn-new-product').style.display = 'none';
 }
 
 // ── Items editor ─────────────────────────────────────────────────

@@ -38,8 +38,20 @@ Tienda Deporte/
 | `quotations` | Solicitudes de cotización. RLS: inserción pública, gestión solo autenticado |
 | `clients` | Clientes derivados de cotizaciones. RLS: solo autenticado |
 
+Columnas relevantes de `products`: `sku` (único, formato `ATH-[CAT]-[NUM]`, ej. `ATH-FUT-001`).
 Columnas relevantes de `quotations`: `tipo_documento` (boleta/factura), `client_rut`, `client_company`.
 Columnas relevantes de `clients`: `credit_line`, `credit_used`, `credit_notes`, `client_type` (natural/empresa).
+
+## Convención SKU
+Formato: `ATH-[CATEGORIA]-[NUMERO]`
+| Prefijo | Categoría |
+|---------|-----------|
+| FUT | Fútbol |
+| BAS | Básquetbol |
+| VOL | Voleibol |
+| TAC | Taca Taca |
+| PAK | Packs / Sets |
+| OTR | Otros deportes |
 
 ## Convenciones del código
 - Variables CSS en `:root` — usar siempre `var(--blue)`, `var(--orange)`, etc.
