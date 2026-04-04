@@ -1274,6 +1274,19 @@
   .cotiz-product-check:hover { border-color: var(--blue); background: var(--blue-light); }
   .cotiz-product-check input { accent-color: var(--blue); width: 15px; height: 15px; }
   .cotiz-product-check.checked { border-color: var(--blue); background: var(--blue-light); font-weight: 600; }
+  .cotiz-doc-toggle {
+    display: flex; gap: 12px; margin-top: 4px;
+  }
+  .cotiz-doc-opt {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 18px; border: 2px solid var(--gray-200); border-radius: 8px;
+    cursor: pointer; font-size: .95rem; transition: border-color .2s, background .2s;
+    user-select: none;
+  }
+  .cotiz-doc-opt:has(input:checked) {
+    border-color: var(--blue); background: var(--blue-light); font-weight: 600;
+  }
+  .cotiz-doc-opt input { accent-color: var(--blue); width: 15px; height: 15px; }
   .cotiz-submit {
     width: 100%; padding: 16px; background: var(--blue); color: white;
     border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
@@ -1776,6 +1789,43 @@
             </div>
           </div>
 
+          <!-- Tipo de documento -->
+          <div class="cotiz-row full">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Tipo de documento</label>
+              <div class="cotiz-doc-toggle">
+                <label class="cotiz-doc-opt">
+                  <input type="radio" name="tipo-doc" id="cq-tipo-doc-boleta" value="boleta" checked onchange="toggleDocFields()">
+                  <span>🧾 Boleta</span>
+                </label>
+                <label class="cotiz-doc-opt">
+                  <input type="radio" name="tipo-doc" id="cq-tipo-doc-factura" value="factura" onchange="toggleDocFields()">
+                  <span>🏢 Factura</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Campos Boleta (cliente natural) -->
+          <div class="cotiz-row" id="cotiz-fields-boleta">
+            <div class="cotiz-group">
+              <label class="cotiz-label">RUT personal <span style="font-weight:400;opacity:.7">(opcional)</span></label>
+              <input class="cotiz-input" type="text" id="cq-rut-personal" placeholder="12.345.678-9">
+            </div>
+          </div>
+
+          <!-- Campos Factura (empresa) -->
+          <div class="cotiz-row" id="cotiz-fields-factura" style="display:none">
+            <div class="cotiz-group">
+              <label class="cotiz-label">RUT empresa <span style="color:#e05d00">*</span></label>
+              <input class="cotiz-input" type="text" id="cq-rut-empresa" placeholder="76.543.210-K">
+            </div>
+            <div class="cotiz-group">
+              <label class="cotiz-label">Nombre / razón social <span style="color:#e05d00">*</span></label>
+              <input class="cotiz-input" type="text" id="cq-empresa" placeholder="Corporación Deportes S.A.">
+            </div>
+          </div>
+
           <!-- Mensaje -->
           <div class="cotiz-row full">
             <div class="cotiz-group">
@@ -2070,6 +2120,18 @@ function toggleCheck(label) {
   label.classList.toggle('checked');
 }
 
+function toggleDocFields() {
+  const esFactura = document.getElementById('cq-tipo-doc-factura').checked;
+  document.getElementById('cotiz-fields-boleta').style.display  = esFactura ? 'none' : '';
+  document.getElementById('cotiz-fields-factura').style.display = esFactura ? ''     : 'none';
+  if (esFactura) {
+    document.getElementById('cq-rut-personal').value = '';
+  } else {
+    document.getElementById('cq-rut-empresa').value = '';
+    document.getElementById('cq-empresa').value     = '';
+  }
+}
+
 // Genera número de cotización: COT-2026-001
 function genCotNumber() {
   const year = new Date().getFullYear();
@@ -2090,12 +2152,17 @@ async function sendCotizacion(e) {
   if (!name) { showToast('El nombre es obligatorio', true); return; }
   if (!email) { showToast('El email es obligatorio', true); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Ingresa un email válido', true); return; }
-  const phone    = document.getElementById('cq-phone').value.trim() || 'No indicado';
-  const tipo     = document.getElementById('cq-tipo').value;
-  const cantidad = document.getElementById('cq-qty').value;
-  const region   = document.getElementById('cq-region').value;
-  const mensaje  = document.getElementById('cq-msg').value.trim() || 'Sin comentarios adicionales';
-  const cotNum   = genCotNumber();
+  const phone        = document.getElementById('cq-phone').value.trim() || 'No indicado';
+  const tipo         = document.getElementById('cq-tipo').value;
+  const cantidad     = document.getElementById('cq-qty').value;
+  const region       = document.getElementById('cq-region').value;
+  const mensaje      = document.getElementById('cq-msg').value.trim() || 'Sin comentarios adicionales';
+  const tipoDoc      = document.querySelector('input[name="tipo-doc"]:checked').value;
+  const rutPersonal  = document.getElementById('cq-rut-personal').value.trim() || null;
+  const rutEmpresa   = document.getElementById('cq-rut-empresa').value.trim() || null;
+  const nombreEmpresa= document.getElementById('cq-empresa').value.trim() || null;
+  const clientRut    = tipoDoc === 'factura' ? rutEmpresa : rutPersonal;
+  const cotNum       = genCotNumber();
 
   const emailParams = {
     cot_number:  cotNum,
@@ -2114,22 +2181,22 @@ async function sendCotizacion(e) {
   btn.textContent = 'Enviando...';
 
   // 1. Guardar en Supabase
-  try {
-    await sb.from('quotations').insert({
-        cot_number:        cotNum,
-        status:            'pendiente',
-        client_name:       name,
-        client_email:      email,
-        client_phone:      phone,
-        client_type:       tipo,
-        products_interest: checked.join(', '),
-        quantity_approx:   cantidad,
-        region:            region,
-        message:           mensaje,
-      });
-  } catch(err) {
-    console.warn('No se pudo guardar en Supabase:', err.message);
-  }
+  const { error: sbError } = await sb.from('quotations').insert({
+    cot_number:        cotNum,
+    status:            'pendiente',
+    client_name:       name,
+    client_email:      email,
+    client_phone:      phone,
+    client_type:       tipo,
+    products_interest: checked.join(', '),
+    quantity_approx:   cantidad,
+    region:            region,
+    message:           mensaje,
+    tipo_documento:    tipoDoc,
+    client_rut:        clientRut,
+    client_company:    nombreEmpresa,
+  });
+  if (sbError) console.warn('Supabase insert error:', sbError.message, sbError.code);
 
   // 2. Enviar email via EmailJS
   if (EMAILJS_PUBLIC_KEY === 'PEGA_TU_PUBLIC_KEY') {

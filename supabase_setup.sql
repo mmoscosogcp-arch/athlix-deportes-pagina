@@ -119,7 +119,37 @@ INSERT INTO products (id, name, brand, sport, price, old_price, img_url, emoji, 
 
 SELECT SETVAL(pg_get_serial_sequence('products', 'id'), 13);
 
--- ── 6. BUCKET DE IMÁGENES ────────────────────────────────────────
+-- ── 6. COLUMNA TIPO_DOCUMENTO EN COTIZACIONES ───────────────────
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS tipo_documento TEXT DEFAULT 'boleta';
+
+-- ── 7. TABLA DE CLIENTES ─────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS clients (
+  id             BIGSERIAL PRIMARY KEY,
+  email          TEXT UNIQUE NOT NULL,
+  name           TEXT NOT NULL,
+  phone          TEXT,
+  rut            TEXT,
+  company_name   TEXT,
+  client_type    TEXT DEFAULT 'natural',   -- natural | empresa
+  credit_line    INTEGER DEFAULT 0,        -- línea de crédito aprobada en CLP
+  credit_used    INTEGER DEFAULT 0,        -- monto utilizado (suma de cotizaciones aprobadas)
+  credit_notes   TEXT,
+  created_at     TIMESTAMPTZ DEFAULT NOW(),
+  updated_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE clients ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Admin gestiona clientes" ON clients;
+CREATE POLICY "Admin gestiona clientes" ON clients
+  FOR ALL USING (auth.role() = 'authenticated');
+
+-- Trigger updated_at para clients
+CREATE TRIGGER clients_updated_at
+  BEFORE UPDATE ON clients
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();
+
+-- ── 8. BUCKET DE IMÁGENES ────────────────────────────────────────
 -- Hacer esto manualmente en Supabase → Storage:
 -- 1. New bucket → nombre: "productos" → marcar como Public
 -- 2. En Policies del bucket, permitir SELECT público
