@@ -623,9 +623,15 @@ ATHLIX STORE SpA</textarea>
 <div id="modal-overlay" style="display:none" onclick="if(event.target===this) closeModal()">
   <div id="modal">
     <div class="modal-title" id="modal-title">Nuevo producto</div>
-    <div class="form-group">
-      <label class="form-label">Nombre *</label>
-      <input class="form-input" id="f-name" type="text" placeholder="Ej: Arco de Fútbol Metálico 5×2 m">
+    <div class="form-row">
+      <div class="form-group" style="flex:2">
+        <label class="form-label">Nombre *</label>
+        <input class="form-input" id="f-name" type="text" placeholder="Ej: Arco de Fútbol Metálico 5×2 m">
+      </div>
+      <div class="form-group" style="flex:1">
+        <label class="form-label">SKU <span class="optional">(opcional)</span></label>
+        <input class="form-input" id="f-sku" type="text" placeholder="ATH-FUT-001" style="text-transform:uppercase;">
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -818,7 +824,7 @@ function cardHTML(p) {
   return `<div class="product-card">
     <div class="card-img">${img}${!inStock?'<div class="no-stock-overlay">SIN STOCK</div>':''}</div>
     <div class="card-body">
-      <div class="card-sport">${p.sport||''}</div>
+      <div class="card-sport">${p.sport||''}${p.sku ? ` <span style="font-size:10px;font-weight:700;color:var(--text-2);background:var(--bg);padding:1px 6px;border-radius:4px;margin-left:4px;">${p.sku}</span>` : ''}</div>
       <div class="card-name">${p.name}</div>
       <div class="card-price">${old}$${price}</div>
       <div class="stock-row">
@@ -848,7 +854,7 @@ function openModal(id=null) {
   document.getElementById('modal-title').textContent = id ? 'Editar producto' : 'Nuevo producto';
   document.getElementById('btn-save').textContent    = id ? 'Guardar cambios' : 'Guardar producto';
   document.getElementById('img-current-note').style.display = 'none';
-  ['f-name','f-price','f-oldprice','f-abono','f-desc'].forEach(i=>document.getElementById(i).value='');
+  ['f-name','f-sku','f-price','f-oldprice','f-abono','f-desc'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('f-sport').value='Fútbol';
   document.getElementById('f-badge').value='';
   document.getElementById('f-img').value='';
@@ -861,6 +867,7 @@ function openModal(id=null) {
 }
 function fillForm(p) {
   document.getElementById('f-name').value    = p.name||'';
+  document.getElementById('f-sku').value     = p.sku||'';
   document.getElementById('f-sport').value   = p.sport||'Fútbol';
   document.getElementById('f-price').value   = p.price||'';
   document.getElementById('f-oldprice').value= p.old_price||'';
@@ -926,7 +933,8 @@ async function saveProduct() {
     const fi=document.getElementById('f-img');
     if(fi.files[0]) imgUrl=await uploadImage(fi.files[0]);
     const bv=document.getElementById('f-badge').value;
-    const data={name,brand:'Athlix',sport:document.getElementById('f-sport').value,price,old_price:parseInt(document.getElementById('f-oldprice').value)||null,img_url:imgUrl||null,emoji:sportEmoji(document.getElementById('f-sport').value),badge:bv||null,badge_type:bv==='Oferta'?'':bv?'blue':'',tags:currentTags,abono:document.getElementById('f-abono').value.trim()||null,description:document.getElementById('f-desc').value.trim()||null,in_stock:formStockValue};
+    const skuVal = document.getElementById('f-sku').value.trim().toUpperCase() || null;
+    const data={sku:skuVal,name,brand:'Athlix',sport:document.getElementById('f-sport').value,price,old_price:parseInt(document.getElementById('f-oldprice').value)||null,img_url:imgUrl||null,emoji:sportEmoji(document.getElementById('f-sport').value),badge:bv||null,badge_type:bv==='Oferta'?'':bv?'blue':'',tags:currentTags,abono:document.getElementById('f-abono').value.trim()||null,description:document.getElementById('f-desc').value.trim()||null,in_stock:formStockValue};
     if(supabaseOk) {
       if(currentEditId){const{error}=await sb.from('products').update(data).eq('id',currentEditId);if(error)throw error;}
       else{const{error}=await sb.from('products').insert(data);if(error)throw error;}
@@ -1284,11 +1292,11 @@ function closePrint() { document.getElementById('print-doc').style.display='none
 function getLocalCotizaciones() { return []; }
 function getLocalProducts() {
   return [
-    {id:1,name:'Arco de Fútbol Metálico 3,00×2,00 mts',brand:'Athlix',sport:'Fútbol',price:359990,old_price:399900,img_url:'Catalogo/arco_3x2_dospulgadas.png',emoji:'🥅',badge:'Oferta',badge_type:'',tags:['Acero galvanizado','Desmontable'],abono:'Desde $200.000/abono',description:'Arco de fútbol en tubo galvanizado calibre 2".',in_stock:true},
-    {id:2,name:'Arco Baby-fútbol 3×2 m',brand:'Athlix',sport:'Fútbol',price:89000,old_price:null,img_url:null,emoji:'⚽',badge:'Nuevo',badge_type:'blue',tags:['Tubo 1.25"','Red incluida'],abono:'Desde $29.700/abono',description:'',in_stock:true},
-    {id:3,name:'Tablero Básquetbol Profesional',brand:'Athlix',sport:'Básquetbol',price:189000,old_price:225000,img_url:null,emoji:'🏀',badge:'Destacado',badge_type:'blue',tags:['Altura regulable','Acero'],abono:'Desde $63.000/abono',description:'',in_stock:true},
-    {id:5,name:'Taca Taca Madera Premium',brand:'Athlix',sport:'Taca Taca',price:149000,old_price:185000,img_url:'Catalogo/tacatacafichero0730.jpg',emoji:'🎯',badge:'Oferta',badge_type:'',tags:['Doble tornamesa','MDF + vidrio'],abono:'Desde $49.700/abono',description:'',in_stock:true},
-    {id:13,name:'Mesa de Ping Pong Profesional',brand:'Athlix',sport:'Otros deportes',price:189000,old_price:229000,img_url:'Catalogo/2000371017926_2.jpg',emoji:'🏓',badge:'Oferta',badge_type:'',tags:['Plegable'],abono:'Desde $63.000/abono',description:'',in_stock:true},
+    {id:1,sku:'ATH-FUT-001',name:'Arco de Fútbol Metálico 3,00×2,00 mts',brand:'Athlix',sport:'Fútbol',price:359990,old_price:399900,img_url:'Catalogo/arco_3x2_dospulgadas.png',emoji:'🥅',badge:'Oferta',badge_type:'',tags:['Acero galvanizado','Desmontable'],abono:'Desde $200.000/abono',description:'Arco de fútbol en tubo galvanizado calibre 2".',in_stock:true},
+    {id:2,sku:'ATH-FUT-002',name:'Arco Baby-fútbol 3×2 m',brand:'Athlix',sport:'Fútbol',price:89000,old_price:null,img_url:null,emoji:'⚽',badge:'Nuevo',badge_type:'blue',tags:['Tubo 1.25"','Red incluida'],abono:'Desde $29.700/abono',description:'',in_stock:true},
+    {id:3,sku:'ATH-BAS-001',name:'Tablero Básquetbol Profesional',brand:'Athlix',sport:'Básquetbol',price:189000,old_price:225000,img_url:null,emoji:'🏀',badge:'Destacado',badge_type:'blue',tags:['Altura regulable','Acero'],abono:'Desde $63.000/abono',description:'',in_stock:true},
+    {id:5,sku:'ATH-TAC-001',name:'Taca Taca Madera Premium',brand:'Athlix',sport:'Taca Taca',price:149000,old_price:185000,img_url:'Catalogo/tacatacafichero0730.jpg',emoji:'🎯',badge:'Oferta',badge_type:'',tags:['Doble tornamesa','MDF + vidrio'],abono:'Desde $49.700/abono',description:'',in_stock:true},
+    {id:13,sku:'ATH-OTR-002',name:'Mesa de Ping Pong Profesional',brand:'Athlix',sport:'Otros deportes',price:189000,old_price:229000,img_url:'Catalogo/2000371017926_2.jpg',emoji:'🏓',badge:'Oferta',badge_type:'',tags:['Plegable'],abono:'Desde $63.000/abono',description:'',in_stock:true},
   ];
 }
 

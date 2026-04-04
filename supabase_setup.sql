@@ -6,6 +6,7 @@
 -- ── 1. TABLA DE PRODUCTOS ────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS products (
   id          BIGSERIAL PRIMARY KEY,
+  sku         TEXT UNIQUE,
   name        TEXT NOT NULL,
   brand       TEXT DEFAULT 'Athlix',
   sport       TEXT NOT NULL,
@@ -102,24 +103,42 @@ CREATE TRIGGER quotations_updated_at
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
 -- ── 5. DATOS INICIALES DE PRODUCTOS ─────────────────────────────
-INSERT INTO products (id, name, brand, sport, price, old_price, img_url, emoji, badge, badge_type, tags, abono, description, in_stock) VALUES
-(1,  'Arco de Fútbol Metálico 3,00×2,00 mts', 'Athlix', 'Fútbol',         359990, 399900,  'Catalogo/arco_3x2_dospulgadas.png',   '🥅',  'Oferta',    '',      ARRAY['Acero galvanizado','Desmontable'],     'Desde $200.000/abono', 'Arco de fútbol en tubo galvanizado calibre 2". Medidas 3.00×2.00 mts. Desmontable. Red incluida.',  TRUE),
-(2,  'Arco de Fútbol Baby-fútbol 3×2 m',      'Athlix', 'Fútbol',         89000,  NULL,     NULL,                                   '⚽',  'Nuevo',     'blue',  ARRAY['Tubo 1.25"','Red incluida'],          'Desde $29.700/abono',  'Arco de baby-fútbol en estructura metálica resistente. Red incluida.',                              TRUE),
-(3,  'Tablero Básquetbol Profesional',         'Athlix', 'Básquetbol',     189000, 225000,   NULL,                                   '🏀',  'Destacado', 'blue',  ARRAY['Altura regulable','Acero'],            'Desde $63.000/abono',  'Tablero de básquetbol en acero galvanizado. Altura regulable 2.4–3.05 m.',                          TRUE),
-(4,  'Parantes de Voleibol con Red',           'Athlix', 'Voleibol',       124000, NULL,     NULL,                                   '🏐',  NULL,        '',      ARRAY['Reglamentario','Set completo'],        'Desde $41.300/abono',  'Set de parantes de voleibol en acero. Red FIVB incluida.',                                          TRUE),
-(5,  'Taca Taca Madera Premium',               'Athlix', 'Taca Taca',      329990, 279990,   NULL                                   '🎯',  'Oferta',    '',      ARRAY['Doble tornamesa','MDF + vidrio'],      'Desde $49.700/abono',  'Mesa de taca-taca en MDF con vidrio templado. 8 jugadores. 2 balones incluidos.',                   TRUE),
-(6,  'Taca Taca Escolar Básico',               'Athlix', 'Taca Taca',      99000,  NULL,     NULL,                                   '🎯',  'Nuevo',     'green', ARRAY['Uso intensivo','MDF reforzado'],        'Desde $33.000/abono',  'Mesa de taca-taca para uso escolar intensivo.',                                                     TRUE),
-(7,  'Red de Voleibol Reglamentaria',          'Athlix', 'Voleibol',       32900,  NULL,     NULL,                                   '🕸️', NULL,        '',      ARRAY['FIVB','Antenas incluidas'],            'Desde $11.000/abono',  'Red oficial de voleibol con antenas laterales. Medidas FIVB.',                                      TRUE),
-(8,  'Arco de Fútbol Portátil PVC',            'Athlix', 'Fútbol',         49000,  62000,    NULL,                                   '🥅',  'Oferta',    '',      ARRAY['PVC resistente','Liviano'],            'Desde $16.300/abono',  'Arco portátil en PVC de alta resistencia. Armado sin herramientas.',                               TRUE),
-(9,  'Canasta Básquetbol Mural',               'Athlix', 'Básquetbol',     69000,  85000,    NULL,                                   '🏀',  'Oferta',    '',      ARRAY['Montaje en muro','Tablero incluido'],  'Desde $23.000/abono',  'Canasta de básquetbol para montaje en muro o poste.',                                               TRUE),
-(10, 'Set Deportivo Escolar Completo',          'Athlix', 'Fútbol',         390000, 480000,  NULL,                                   '🏟️', 'Pack',      'blue',  ARRAY['Todo incluido','Colegios'],            'Desde $130.000/abono', 'Pack: 2 arcos + tablero básquetbol + parantes de voleibol. Precio institucional.',                   TRUE),
-(11, 'Aro de Básquetbol con Poste',            'Athlix', 'Básquetbol',     95000,  NULL,     NULL,                                   '🏀',  'Nuevo',     'green', ARRAY['Poste incluido','Exterior'],           'Desde $31.700/abono',  'Aro de básquetbol con poste de acero 3 m. Red incluida.',                                           TRUE),
-(12, 'Parante de Arco Baby-fútbol',            'Athlix', 'Otros deportes', 45000,  55000,    NULL,                                   '🏅',  'Oferta',    '',      ARRAY['Metálico','Par'],                      'Desde $15.000/abono',  'Par de parantes metálicos para baby-fútbol.',                                                       TRUE),
-(13, 'Mesa de Ping Pong Profesional',          'Athlix', 'Otros deportes', 189000, 229000,   NULL,        '🏓',  'Oferta',    '',      ARRAY['Plegable','Interior y exterior'],      'Desde $63.000/abono',  'Mesa de ping pong plegable con ruedas. Red incluida.',                                              TRUE);
+INSERT INTO products (id, sku, name, brand, sport, price, old_price, img_url, emoji, badge, badge_type, tags, abono, description, in_stock) VALUES
+(1,  'ATH-FUT-001', 'Arco de Fútbol Metálico 3,00×2,00 mts', 'Athlix', 'Fútbol',         359990, 399900,  'Catalogo/arco_3x2_dospulgadas.png',   '🥅',  'Oferta',    '',      ARRAY['Acero galvanizado','Desmontable'],     'Desde $200.000/abono', 'Arco de fútbol en tubo galvanizado calibre 2". Medidas 3.00×2.00 mts. Desmontable. Red incluida.',  TRUE),
+(2,  'ATH-FUT-002', 'Arco de Fútbol Baby-fútbol 3×2 m',      'Athlix', 'Fútbol',         89000,  NULL,     NULL,                                   '⚽',  'Nuevo',     'blue',  ARRAY['Tubo 1.25"','Red incluida'],          'Desde $29.700/abono',  'Arco de baby-fútbol en estructura metálica resistente. Red incluida.',                              TRUE),
+(3,  'ATH-BAS-001', 'Tablero Básquetbol Profesional',         'Athlix', 'Básquetbol',     189000, 225000,   NULL,                                   '🏀',  'Destacado', 'blue',  ARRAY['Altura regulable','Acero'],            'Desde $63.000/abono',  'Tablero de básquetbol en acero galvanizado. Altura regulable 2.4–3.05 m.',                          TRUE),
+(4,  'ATH-VOL-001', 'Parantes de Voleibol con Red',           'Athlix', 'Voleibol',       124000, NULL,     NULL,                                   '🏐',  NULL,        '',      ARRAY['Reglamentario','Set completo'],        'Desde $41.300/abono',  'Set de parantes de voleibol en acero. Red FIVB incluida.',                                          TRUE),
+(5,  'ATH-TAC-001', 'Taca Taca Madera Premium',               'Athlix', 'Taca Taca',      329990, 279990,   NULL,                                   '🎯',  'Oferta',    '',      ARRAY['Doble tornamesa','MDF + vidrio'],      'Desde $49.700/abono',  'Mesa de taca-taca en MDF con vidrio templado. 8 jugadores. 2 balones incluidos.',                   TRUE),
+(6,  'ATH-TAC-002', 'Taca Taca Escolar Básico',               'Athlix', 'Taca Taca',      99000,  NULL,     NULL,                                   '🎯',  'Nuevo',     'green', ARRAY['Uso intensivo','MDF reforzado'],        'Desde $33.000/abono',  'Mesa de taca-taca para uso escolar intensivo.',                                                     TRUE),
+(7,  'ATH-VOL-002', 'Red de Voleibol Reglamentaria',          'Athlix', 'Voleibol',       32900,  NULL,     NULL,                                   '🕸️', NULL,        '',      ARRAY['FIVB','Antenas incluidas'],            'Desde $11.000/abono',  'Red oficial de voleibol con antenas laterales. Medidas FIVB.',                                      TRUE),
+(8,  'ATH-FUT-003', 'Arco de Fútbol Portátil PVC',            'Athlix', 'Fútbol',         49000,  62000,    NULL,                                   '🥅',  'Oferta',    '',      ARRAY['PVC resistente','Liviano'],            'Desde $16.300/abono',  'Arco portátil en PVC de alta resistencia. Armado sin herramientas.',                               TRUE),
+(9,  'ATH-BAS-002', 'Canasta Básquetbol Mural',               'Athlix', 'Básquetbol',     69000,  85000,    NULL,                                   '🏀',  'Oferta',    '',      ARRAY['Montaje en muro','Tablero incluido'],  'Desde $23.000/abono',  'Canasta de básquetbol para montaje en muro o poste.',                                               TRUE),
+(10, 'ATH-PAK-001', 'Set Deportivo Escolar Completo',          'Athlix', 'Fútbol',         390000, 480000,  NULL,                                   '🏟️', 'Pack',      'blue',  ARRAY['Todo incluido','Colegios'],            'Desde $130.000/abono', 'Pack: 2 arcos + tablero básquetbol + parantes de voleibol. Precio institucional.',                   TRUE),
+(11, 'ATH-BAS-003', 'Aro de Básquetbol con Poste',            'Athlix', 'Básquetbol',     95000,  NULL,     NULL,                                   '🏀',  'Nuevo',     'green', ARRAY['Poste incluido','Exterior'],           'Desde $31.700/abono',  'Aro de básquetbol con poste de acero 3 m. Red incluida.',                                           TRUE),
+(12, 'ATH-OTR-001', 'Parante de Arco Baby-fútbol',            'Athlix', 'Otros deportes', 45000,  55000,    NULL,                                   '🏅',  'Oferta',    '',      ARRAY['Metálico','Par'],                      'Desde $15.000/abono',  'Par de parantes metálicos para baby-fútbol.',                                                       TRUE),
+(13, 'ATH-OTR-002', 'Mesa de Ping Pong Profesional',          'Athlix', 'Otros deportes', 189000, 229000,   NULL,                                   '🏓',  'Oferta',    '',      ARRAY['Plegable','Interior y exterior'],      'Desde $63.000/abono',  'Mesa de ping pong plegable con ruedas. Red incluida.',                                              TRUE);
 
 SELECT SETVAL(pg_get_serial_sequence('products', 'id'), 13);
 
--- ── 6. COLUMNA TIPO_DOCUMENTO EN COTIZACIONES ───────────────────
+-- ── 6. COLUMNA SKU EN PRODUCTS (para bases existentes) ──────────
+ALTER TABLE products ADD COLUMN IF NOT EXISTS sku TEXT UNIQUE;
+
+-- Asignar SKUs a productos existentes si aún no los tienen
+UPDATE products SET sku = 'ATH-FUT-001' WHERE id = 1  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-FUT-002' WHERE id = 2  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-BAS-001' WHERE id = 3  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-VOL-001' WHERE id = 4  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-TAC-001' WHERE id = 5  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-TAC-002' WHERE id = 6  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-VOL-002' WHERE id = 7  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-FUT-003' WHERE id = 8  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-BAS-002' WHERE id = 9  AND sku IS NULL;
+UPDATE products SET sku = 'ATH-PAK-001' WHERE id = 10 AND sku IS NULL;
+UPDATE products SET sku = 'ATH-BAS-003' WHERE id = 11 AND sku IS NULL;
+UPDATE products SET sku = 'ATH-OTR-001' WHERE id = 12 AND sku IS NULL;
+UPDATE products SET sku = 'ATH-OTR-002' WHERE id = 13 AND sku IS NULL;
+
+-- ── 7. COLUMNA TIPO_DOCUMENTO EN COTIZACIONES ───────────────────
 ALTER TABLE quotations ADD COLUMN IF NOT EXISTS tipo_documento TEXT DEFAULT 'boleta';
 
 -- ── 7. TABLA DE CLIENTES ─────────────────────────────────────────
