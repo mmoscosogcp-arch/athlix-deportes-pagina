@@ -3,7 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Athlix Store — Equipamiento Deportivo</title>
+<title>Athlix Store — Equipamiento Deportivo para Colegios, Clubes y Municipalidades</title>
+<meta name="description" content="Arcos de fútbol, tableros de básquetbol, taca-taca, parantes de voleibol y más. Equipamiento deportivo profesional para colegios, clubes y municipalidades en Chile. Cotiza sin costo en menos de 24 horas.">
+<meta name="keywords" content="equipamiento deportivo Chile, arcos de fútbol, tableros básquetbol, taca taca, parantes voleibol, equipamiento colegios, equipamiento clubes deportivos">
+<meta name="author" content="Athlix Store">
+<meta name="robots" content="index, follow">
+<!-- Open Graph / Redes sociales -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Athlix Store — Equipamiento Deportivo Profesional">
+<meta property="og:description" content="Arcos, tableros, taca-taca y más. Equipamiento deportivo para colegios, clubes y municipalidades en Chile. Cotiza sin costo.">
+<meta property="og:image" content="Catalogo/arco_3x2_dospulgadas.png">
+<meta property="og:locale" content="es_CL">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Athlix Store — Equipamiento Deportivo">
+<meta name="twitter:description" content="Equipamiento deportivo profesional para colegios, clubes y municipalidades en Chile.">
+<meta name="twitter:image" content="Catalogo/arco_3x2_dospulgadas.png">
+<!-- Canonical -->
+<link rel="canonical" href="https://athlixstore.cl/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -1372,8 +1389,8 @@
       </h1>
       <p class="hero-sub">Arcos de fútbol, taca-taca, tableros de básquetbol y parantes de voleibol. Fabricados para durar, diseñados para rendir.</p>
       <div class="hero-ctas">
-        <a class="btn-primary" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Cotiza tu proyecto →</a>
-        <a class="btn-secondary" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1])" style="cursor:pointer">Ver productos</a>
+        <a class="btn-primary" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Cotizar gratis ahora →</a>
+        <a class="btn-secondary" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1])" style="cursor:pointer">Ver catálogo completo</a>
       </div>
       <div class="hero-stats">
         <div>
@@ -1498,7 +1515,7 @@
           <div class="abono-step"><div class="step-num">4</div>Recibe tu pedido</div>
         </div>
       </div>
-      <a class="abono-cta" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Consultar ahora</a>
+      <a class="abono-cta" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Solicitar condiciones →</a>
     </div>
   </div>
 </section>
@@ -1536,12 +1553,17 @@
     <div>
       <div class="catalog-top-bar">
         <div class="result-count">Mostrando <strong id="result-num">12</strong> productos</div>
-        <select class="sort-select" onchange="applyFilters()">
-          <option>Más vendidos</option>
-          <option>Precio: menor a mayor</option>
-          <option>Precio: mayor a menor</option>
-          <option>Más recientes</option>
-        </select>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="catalog-search" placeholder="🔍 Buscar producto..." oninput="applyFilters()"
+            style="padding:8px 14px;border:1px solid var(--gray-200);border-radius:8px;font-size:14px;font-family:var(--font-body);outline:none;min-width:200px;background:var(--white);color:var(--text);transition:border-color .2s;"
+            onfocus="this.style.borderColor='var(--blue)'" onblur="this.style.borderColor='var(--gray-200)'">
+          <select class="sort-select" onchange="applyFilters()">
+            <option>Más vendidos</option>
+            <option>Precio: menor a mayor</option>
+            <option>Precio: mayor a menor</option>
+            <option>Más recientes</option>
+          </select>
+        </div>
       </div>
       <div class="active-filters" id="active-filters-display"></div>
       <div class="products-grid" id="catalog-grid"></div>
@@ -1852,6 +1874,33 @@
   </div>
 </section>
 </div><!-- end .page -->
+<!-- ─── MODAL TRANSFERENCIA ─── -->
+<div class="modal-overlay" id="transfer-modal" onclick="if(event.target===this) closeTransferModal()">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">🏦 Datos para transferencia</div>
+      <button class="modal-close" onclick="closeTransferModal()">✕</button>
+    </div>
+    <div style="padding:20px 0 8px;">
+      <div style="background:var(--bg);border-radius:10px;padding:18px 20px;display:grid;gap:10px;font-size:14px;">
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-2)">Banco</span><strong id="t-banco">—</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-2)">Tipo de cuenta</span><strong>Cuenta corriente</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-2)">N° cuenta</span><strong id="t-cuenta">—</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-2)">RUT</span><strong id="t-rut">—</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-2)">Nombre</span><strong>Athlix Store</strong></div>
+        <div style="display:flex;justify-content:space-between;"><span style="color:var(--text-2)">Email</span><strong>athlixchile@gmail.com</strong></div>
+        <hr style="border:none;border-top:1px solid var(--gray-200);margin:4px 0;">
+        <div style="display:flex;justify-content:space-between;font-size:15px;"><span style="color:var(--text-2)">Monto a transferir</span><strong id="t-monto" style="color:var(--blue);font-size:17px;">—</strong></div>
+      </div>
+      <p style="font-size:13px;color:var(--text-2);margin-top:14px;line-height:1.6;">
+        Una vez realizada la transferencia, envía el comprobante por WhatsApp para coordinar el despacho.
+      </p>
+      <a id="t-whatsapp-link" href="#" target="_blank" class="btn-primary" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:14px;">
+        💬 Enviar comprobante por WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
 <!-- ─── MODAL AYUDA ─── -->
 <div class="modal-overlay" id="help-modal" onclick="if(event.target===this) closeHelpModal()">
   <div class="modal-box" style="max-width:560px">
@@ -2293,9 +2342,11 @@ function applyFilters() {
   const checked = [...document.querySelectorAll('#sport-filters input:checked')].map(c => c.value);
   const minP = parseInt(document.getElementById('price-min')?.value) || 0;
   const maxP = parseInt(document.getElementById('price-max')?.value) || Infinity;
+  const q = (document.getElementById('catalog-search')?.value || '').toLowerCase().trim();
   let filtered = products.filter(p => {
     if (checked.length && !checked.includes(p.sport)) return false;
     if (p.price < minP || p.price > maxP) return false;
+    if (q && !p.name.toLowerCase().includes(q) && !(p.desc||'').toLowerCase().includes(q) && !(p.sku||'').toLowerCase().includes(q)) return false;
     return true;
   });
   renderCatalog(filtered);
@@ -2311,6 +2362,7 @@ function clearFilters() {
   document.querySelectorAll('#sport-filters input, #catalog input[type=checkbox]').forEach(c => c.checked = false);
   document.getElementById('price-min').value = '';
   document.getElementById('price-max').value = '';
+  const cs = document.getElementById('catalog-search'); if (cs) cs.value = '';
   applyFilters();
 }
 // ─── PRODUCT DETAIL ───
@@ -2620,10 +2672,7 @@ function confirmOrder() {
   };
   closeModal();
   if (selectedMethod === 'transferencia') {
-    showToast('🏦 Te enviamos los datos bancarios por WhatsApp/email');
-    setTimeout(() => {
-      alert('Datos de transferencia:\n\nBanco: [Tu banco]\nCuenta corriente: XXXXXXXXX\nRUT: XX.XXX.XXX-X\nNombre: Athlix Store\nEmail: ventas@atlixstore.cl\nMonto: $' + abono.toLocaleString('es-CL') + '\n\nEnvía el comprobante por WhatsApp para coordinar despacho.');
-    }, 400);
+    openTransferModal(abono);
   } else {
     showToast('🔄 Redirigiendo al pago...');
     setTimeout(() => {
@@ -2780,8 +2829,27 @@ function closeHelpModal() {
   document.getElementById('help-modal').classList.remove('open');
   document.body.style.overflow = '';
 }
+function openTransferModal(montoAbono) {
+  // ── Configura aquí tus datos bancarios ──
+  const BANCO   = 'Banco de Chile';
+  const CUENTA  = '00-000-00000-00';
+  const RUT     = '76.XXX.XXX-X';
+  // ────────────────────────────────────────
+  document.getElementById('t-banco').textContent  = BANCO;
+  document.getElementById('t-cuenta').textContent = CUENTA;
+  document.getElementById('t-rut').textContent    = RUT;
+  document.getElementById('t-monto').textContent  = '$' + montoAbono.toLocaleString('es-CL');
+  const msg = encodeURIComponent(`Hola Athlix! Acabo de realizar una transferencia de $${montoAbono.toLocaleString('es-CL')} como abono. Adjunto comprobante.`);
+  document.getElementById('t-whatsapp-link').href = `https://wa.me/56964329683?text=${msg}`;
+  document.getElementById('transfer-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTransferModal() {
+  document.getElementById('transfer-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
 // cerrar con Escape
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHelpModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeHelpModal(); closeTransferModal(); } });
 
 // ─── INIT ───
 renderCatalog(products);
