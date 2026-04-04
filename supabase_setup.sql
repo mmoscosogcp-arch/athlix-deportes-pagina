@@ -168,7 +168,28 @@ CREATE TRIGGER clients_updated_at
   BEFORE UPDATE ON clients
   FOR EACH ROW EXECUTE FUNCTION update_updated_at();
 
--- ── 8. BUCKET DE IMÁGENES ────────────────────────────────────────
+-- ── 8. STOCK QUANTITY EN PRODUCTS ───────────────────────────────
+ALTER TABLE products ADD COLUMN IF NOT EXISTS stock_qty INTEGER DEFAULT NULL;
+-- NULL = stock ilimitado / sin control de cantidad
+-- 0    = sin stock
+-- N    = N unidades disponibles
+
+-- ── 9. FOTOS DE REFERENCIA EN COTIZACIONES ───────────────────────
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS foto_ref_1 TEXT;
+ALTER TABLE quotations ADD COLUMN IF NOT EXISTS foto_ref_2 TEXT;
+
+-- ── 10. BUCKETS DE STORAGE ───────────────────────────────────────
 -- Hacer esto manualmente en Supabase → Storage:
--- 1. New bucket → nombre: "productos" → marcar como Public
--- 2. En Policies del bucket, permitir SELECT público
+-- BUCKET 1: nombre "productos"   → Public (ya existente)
+-- BUCKET 2: nombre "cotizaciones-fotos" → Public
+--   Policies para cotizaciones-fotos:
+--   INSERT: WITH CHECK (bucket_id = 'cotizaciones-fotos')  → rol: public (anon)
+--   SELECT: USING (bucket_id = 'cotizaciones-fotos')       → rol: public
+-- SQL para crear las políticas:
+CREATE POLICY "Subida pública fotos cotización" ON storage.objects
+  FOR INSERT TO anon
+  WITH CHECK (bucket_id = 'cotizaciones-fotos');
+
+CREATE POLICY "Lectura pública fotos cotización" ON storage.objects
+  FOR SELECT TO public
+  USING (bucket_id = 'cotizaciones-fotos');

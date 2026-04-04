@@ -38,8 +38,8 @@ Tienda Deporte/
 | `quotations` | Solicitudes de cotización. RLS: inserción pública, gestión solo autenticado |
 | `clients` | Clientes derivados de cotizaciones. RLS: solo autenticado |
 
-Columnas relevantes de `products`: `sku` (único, formato `ATH-[CAT]-[NUM]`, ej. `ATH-FUT-001`).
-Columnas relevantes de `quotations`: `tipo_documento` (boleta/factura), `client_rut`, `client_company`.
+Columnas relevantes de `products`: `sku` (único, formato `ATH-[CAT]-[NUM]`), `stock_qty` (INTEGER, NULL = ilimitado, 0 = agotado, N = unidades).
+Columnas relevantes de `quotations`: `tipo_documento` (boleta/factura), `client_rut`, `client_company`, `foto_ref_1`, `foto_ref_2` (URLs Supabase Storage bucket `cotizaciones-fotos`).
 Columnas relevantes de `clients`: `credit_line`, `credit_used`, `credit_notes`, `client_type` (natural/empresa).
 
 ## Convención SKU

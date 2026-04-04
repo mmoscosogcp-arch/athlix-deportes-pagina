@@ -693,11 +693,18 @@ ATHLIX STORE SpA</textarea>
       </div>
       <div id="img-current-note" style="font-size:12px;color:var(--text-2);margin-top:5px;display:none">📷 Foto guardada. Sube nueva para reemplazar.</div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Stock</label>
-      <div class="stock-form-row">
-        <button class="toggle-track on" id="f-stock-btn" onclick="toggleFormStock()"></button>
-        <span class="stock-form-label" id="f-stock-lbl" style="color:var(--green)">En stock</span>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Stock</label>
+        <div class="stock-form-row">
+          <button class="toggle-track on" id="f-stock-btn" onclick="toggleFormStock()"></button>
+          <span class="stock-form-label" id="f-stock-lbl" style="color:var(--green)">En stock</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cantidad disponible <span class="optional">(opcional)</span></label>
+        <input class="form-input" id="f-stock-qty" type="number" min="0" placeholder="Vacío = ilimitado" style="width:100%">
+        <div class="form-hint">Si dejas vacío, no se limita la cantidad que puede pedir un cliente.</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -848,6 +855,7 @@ function cardHTML(p) {
           <button class="toggle-track ${inStock?'on':''}"></button>
           <span class="toggle-label ${inStock?'on':'off'}">${inStock?'En stock':'Sin stock'}</span>
         </div>
+        ${p.stock_qty != null ? `<span style="font-size:11px;font-weight:700;color:${p.stock_qty===0?'var(--red)':p.stock_qty<=3?'var(--yellow)':'var(--green)'};background:var(--bg);padding:2px 7px;border-radius:4px;">${p.stock_qty===0?'Agotado':p.stock_qty+' uds.'}</span>` : ''}
       </div>
       <div class="card-actions">
         <button class="btn-edit" onclick="openModal(${p.id})">✏️ Editar</button>
@@ -870,7 +878,7 @@ function openModal(id=null) {
   document.getElementById('modal-title').textContent = id ? 'Editar producto' : 'Nuevo producto';
   document.getElementById('btn-save').textContent    = id ? 'Guardar cambios' : 'Guardar producto';
   document.getElementById('img-current-note').style.display = 'none';
-  ['f-name','f-sku','f-price','f-oldprice','f-abono','f-desc'].forEach(i=>document.getElementById(i).value='');
+  ['f-name','f-sku','f-price','f-oldprice','f-abono','f-desc','f-stock-qty'].forEach(i=>document.getElementById(i).value='');
   document.getElementById('f-sport').value='Fútbol';
   document.getElementById('f-badge').value='';
   document.getElementById('f-img').value='';
@@ -882,8 +890,9 @@ function openModal(id=null) {
   document.getElementById('f-name').focus();
 }
 function fillForm(p) {
-  document.getElementById('f-name').value    = p.name||'';
-  document.getElementById('f-sku').value     = p.sku||'';
+  document.getElementById('f-name').value      = p.name||'';
+  document.getElementById('f-sku').value       = p.sku||'';
+  document.getElementById('f-stock-qty').value = p.stock_qty != null ? p.stock_qty : '';
   document.getElementById('f-sport').value   = p.sport||'Fútbol';
   document.getElementById('f-price').value   = p.price||'';
   document.getElementById('f-oldprice').value= p.old_price||'';
@@ -949,8 +958,10 @@ async function saveProduct() {
     const fi=document.getElementById('f-img');
     if(fi.files[0]) imgUrl=await uploadImage(fi.files[0]);
     const bv=document.getElementById('f-badge').value;
-    const skuVal = document.getElementById('f-sku').value.trim().toUpperCase() || null;
-    const data={sku:skuVal,name,brand:'Athlix',sport:document.getElementById('f-sport').value,price,old_price:parseInt(document.getElementById('f-oldprice').value)||null,img_url:imgUrl||null,emoji:sportEmoji(document.getElementById('f-sport').value),badge:bv||null,badge_type:bv==='Oferta'?'':bv?'blue':'',tags:currentTags,abono:document.getElementById('f-abono').value.trim()||null,description:document.getElementById('f-desc').value.trim()||null,in_stock:formStockValue};
+    const skuVal     = document.getElementById('f-sku').value.trim().toUpperCase() || null;
+    const stockQtyRaw = document.getElementById('f-stock-qty').value;
+    const stockQty   = stockQtyRaw !== '' ? parseInt(stockQtyRaw) : null;
+    const data={sku:skuVal,name,brand:'Athlix',sport:document.getElementById('f-sport').value,price,old_price:parseInt(document.getElementById('f-oldprice').value)||null,img_url:imgUrl||null,emoji:sportEmoji(document.getElementById('f-sport').value),badge:bv||null,badge_type:bv==='Oferta'?'':bv?'blue':'',tags:currentTags,abono:document.getElementById('f-abono').value.trim()||null,description:document.getElementById('f-desc').value.trim()||null,in_stock:formStockValue,stock_qty:stockQty};
     if(supabaseOk) {
       if(currentEditId){const{error}=await sb.from('products').update(data).eq('id',currentEditId);if(error)throw error;}
       else{const{error}=await sb.from('products').insert(data);if(error)throw error;}

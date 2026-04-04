@@ -1487,7 +1487,7 @@
       <div class="benefit-card">
         <div class="benefit-icon">📐</div>
         <div class="benefit-title">Fabricación a medida</div>
-        <div class="benefit-desc">Personalizamos dimensiones, colores e instalación según tu espacio. Cada proyecto es único.</div>
+        <div class="benefit-desc">Personalizamos dimensiones y colores según tu espacio. La instalación tiene un costo adicional que se cotiza según el proyecto.</div>
       </div>
       <div class="benefit-card">
         <div class="benefit-icon">🏫</div>
@@ -1848,11 +1848,31 @@
             </div>
           </div>
 
+          <!-- Fotos de referencia -->
+          <div class="cotiz-row full">
+            <div class="cotiz-group">
+              <label class="cotiz-label">Fotos de referencia <span style="font-weight:400;opacity:.7">(opcional, máx. 2 imágenes)</span></label>
+              <div id="cq-photo-area" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+                <label id="cq-photo-btn-1" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:110px;height:110px;border:2px dashed var(--gray-200);border-radius:10px;cursor:pointer;font-size:12px;color:var(--text-2);transition:border-color .2s;background:var(--white);" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="if(!document.getElementById('cq-photo-1').files[0])this.style.borderColor='var(--gray-200)'">
+                  <span id="cq-photo-icon-1" style="font-size:24px;">📷</span>
+                  <span id="cq-photo-label-1">Foto 1</span>
+                  <input type="file" id="cq-photo-1" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="previewCotizPhoto(this,1)">
+                </label>
+                <label id="cq-photo-btn-2" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:110px;height:110px;border:2px dashed var(--gray-200);border-radius:10px;cursor:pointer;font-size:12px;color:var(--text-2);transition:border-color .2s;background:var(--white);" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="if(!document.getElementById('cq-photo-2').files[0])this.style.borderColor='var(--gray-200)'">
+                  <span id="cq-photo-icon-2" style="font-size:24px;">📷</span>
+                  <span id="cq-photo-label-2">Foto 2</span>
+                  <input type="file" id="cq-photo-2" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="previewCotizPhoto(this,2)">
+                </label>
+              </div>
+              <p style="font-size:11px;color:var(--text-2);margin-top:6px;">JPG, PNG o WEBP · Máx. 5 MB por foto · Ayuda a cotizar con más precisión</p>
+            </div>
+          </div>
+
           <!-- Mensaje -->
           <div class="cotiz-row full">
             <div class="cotiz-group">
               <label class="cotiz-label">Cuéntanos más (opcional)</label>
-              <textarea class="cotiz-textarea" id="cq-msg" placeholder="Medidas especiales, fechas, presupuesto, instalación, cualquier detalle que nos ayude a cotizar mejor..."></textarea>
+              <textarea class="cotiz-textarea" id="cq-msg" placeholder="Medidas especiales, fechas, presupuesto, cualquier detalle que nos ayude a cotizar mejor..."></textarea>
             </div>
           </div>
 
@@ -2063,7 +2083,7 @@
         <div class="footer-col-title">Ayuda</div>
         <div class="footer-links">
           <a href="#" onclick="openHelpModal('como-comprar')">Cómo comprar</a>
-          <a href="#" onclick="openHelpModal('pago-abonos')">Pago en abonos</a>
+          <a href="#" onclick="openHelpModal('pago-abonos')">Formas de pago</a>
           <a href="#" onclick="openHelpModal('envios')">Envíos y plazos</a>
           <a href="#" onclick="openHelpModal('faq')">Preguntas frecuentes</a>
         </div>
@@ -2125,6 +2145,8 @@ function normalize(row) {
     abono:     row.abono     || '',
     desc:      row.description || '',
     inStock:   row.in_stock !== false,
+    stockQty:  row.stock_qty != null ? row.stock_qty : null,
+    sku:       row.sku || null,
   };
 }
 
@@ -2167,6 +2189,53 @@ emailjs.init({
 
 function toggleCheck(label) {
   label.classList.toggle('checked');
+}
+
+function previewCotizPhoto(input, num) {
+  const file = input.files[0];
+  const btn   = document.getElementById(`cq-photo-btn-${num}`);
+  const icon  = document.getElementById(`cq-photo-icon-${num}`);
+  const label = document.getElementById(`cq-photo-label-${num}`);
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showToast('La foto supera 5 MB', true);
+    input.value = '';
+    return;
+  }
+  const url = URL.createObjectURL(file);
+  btn.style.backgroundImage    = `url(${url})`;
+  btn.style.backgroundSize     = 'cover';
+  btn.style.backgroundPosition = 'center';
+  btn.style.borderColor        = 'var(--blue)';
+  icon.style.display  = 'none';
+  label.textContent   = '✕ Quitar';
+  label.style.background = 'rgba(0,0,0,.55)';
+  label.style.color      = 'white';
+  label.style.padding    = '2px 8px';
+  label.style.borderRadius = '4px';
+  label.onclick = (e) => { e.preventDefault(); clearCotizPhoto(num); };
+}
+function clearCotizPhoto(num) {
+  const input = document.getElementById(`cq-photo-${num}`);
+  const btn   = document.getElementById(`cq-photo-btn-${num}`);
+  const icon  = document.getElementById(`cq-photo-icon-${num}`);
+  const label = document.getElementById(`cq-photo-label-${num}`);
+  input.value = '';
+  btn.style.backgroundImage = '';
+  btn.style.borderColor     = 'var(--gray-200)';
+  icon.style.display = '';
+  label.textContent   = `Foto ${num}`;
+  label.style.background = '';
+  label.style.color      = '';
+  label.style.padding    = '';
+  label.onclick = null;
+}
+async function uploadCotizPhoto(file, cotNum, num) {
+  const ext  = file.name.split('.').pop().toLowerCase();
+  const name = `${cotNum}-foto${num}-${Date.now()}.${ext}`;
+  const { error } = await sb.storage.from('cotizaciones-fotos').upload(name, file, { upsert: true });
+  if (error) { console.warn('Error subiendo foto:', error.message); return null; }
+  return sb.storage.from('cotizaciones-fotos').getPublicUrl(name).data.publicUrl;
 }
 
 function toggleDocFields() {
@@ -2229,7 +2298,14 @@ async function sendCotizacion(e) {
   btn.disabled    = true;
   btn.textContent = 'Enviando...';
 
-  // 1. Guardar en Supabase
+  // 1. Subir fotos de referencia (si las hay)
+  let fotoUrl1 = null, fotoUrl2 = null;
+  const foto1 = document.getElementById('cq-photo-1').files[0];
+  const foto2 = document.getElementById('cq-photo-2').files[0];
+  if (foto1) fotoUrl1 = await uploadCotizPhoto(foto1, cotNum, 1);
+  if (foto2) fotoUrl2 = await uploadCotizPhoto(foto2, cotNum, 2);
+
+  // 2. Guardar en Supabase
   const { error: sbError } = await sb.from('quotations').insert({
     cot_number:        cotNum,
     status:            'pendiente',
@@ -2244,6 +2320,8 @@ async function sendCotizacion(e) {
     tipo_documento:    tipoDoc,
     client_rut:        clientRut,
     client_company:    nombreEmpresa,
+    foto_ref_1:        fotoUrl1,
+    foto_ref_2:        fotoUrl2,
   });
   if (sbError) console.warn('Supabase insert error:', sbError.message, sbError.code);
 
@@ -2266,6 +2344,8 @@ async function sendCotizacion(e) {
 
 function showSuccess(cotNum) {
   document.getElementById('cotiz-form').style.display   = 'none';
+  // Limpiar fotos
+  clearCotizPhoto(1); clearCotizPhoto(2);
   const suc = document.getElementById('cotiz-success');
   suc.style.display = 'block';
   if (cotNum) {
@@ -2466,6 +2546,12 @@ function addCart(productId) {
   const p = products.find(x => x.id === productId);
   if (!p) return;
   const existing = cart.find(item => item.product.id === productId);
+  const currentQty = existing ? existing.qty : 0;
+  // Verificar límite de stock
+  if (p.stockQty != null && currentQty >= p.stockQty) {
+    showToast(`Solo quedan ${p.stockQty} unidad${p.stockQty===1?'':'s'} disponibles`, true);
+    return;
+  }
   if (existing) { existing.qty++; }
   else { cart.push({ product: p, qty: 1 }); }
   saveCart();
@@ -2485,6 +2571,10 @@ function removeFromCart(productId) {
 function updateCartQty(productId, delta) {
   const item = cart.find(i => i.product.id === productId);
   if (!item) return;
+  if (delta > 0 && item.product.stockQty != null && item.qty >= item.product.stockQty) {
+    showToast(`Solo quedan ${item.product.stockQty} unidad${item.product.stockQty===1?'':'s'} disponibles`, true);
+    return;
+  }
   item.qty = Math.max(0, item.qty + delta);
   if (item.qty === 0) removeFromCart(productId);
   else { saveCart(); updateCartBadge(); renderCart(); }
@@ -2700,7 +2790,7 @@ const helpContent = {
         </div>
         <div style="display:flex;gap:14px;align-items:flex-start">
           <div style="min-width:32px;height:32px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px">3</div>
-          <div><strong style="display:block;margin-bottom:4px">Recibe tu pedido</strong><span style="font-size:13px;color:var(--text-2)">Coordinamos el despacho e instalación según tu región. Te avisamos con anticipación la fecha de entrega.</span></div>
+          <div><strong style="display:block;margin-bottom:4px">Recibe tu pedido</strong><span style="font-size:13px;color:var(--text-2)">Coordinamos el despacho según tu región. Te avisamos con anticipación la fecha de entrega. La instalación tiene un costo adicional según el proyecto.</span></div>
         </div>
         <div style="background:var(--gray-100);border-radius:10px;padding:14px;font-size:13px;color:var(--text-2);margin-top:4px">
           💬 <strong>¿Tienes dudas?</strong> Escríbenos directamente por WhatsApp al <a href="tel:+56964329683" style="color:var(--blue)">+56 9 6432 9683</a> y te ayudamos.
@@ -2773,7 +2863,7 @@ const helpContent = {
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
             <span style="font-size:20px">🚚</span>
-            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Despacho Región Metropolitana</strong><span style="font-size:12px;color:var(--text-2)">Entrega directa con instalación incluida. Coordinamos fecha y horario contigo.</span></div>
+            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Despacho Región Metropolitana</strong><span style="font-size:12px;color:var(--text-2)">Entrega directa. Coordinamos fecha y horario contigo. La instalación tiene un costo adicional que se informa en la cotización.</span></div>
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
             <span style="font-size:20px">📦</span>
