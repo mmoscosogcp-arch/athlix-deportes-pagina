@@ -17,7 +17,7 @@ Sigue estos pasos una sola vez. Tarda ~10 minutos.
 1. En EmailJS, ve a **Email Services → Add New Service**
 2. Selecciona **Gmail**
 3. Clic en "Connect Account" → autoriza con `athlixchile@gmail.com`
-4. Ponle el nombre: `athlix_gmail`
+4. Ponle el nombre: `   `
 5. Clic en "Create Service"
 6. Copia el **Service ID** (algo como `service_abc123`) → lo necesitas después
 
@@ -33,6 +33,7 @@ Sigue estos pasos una sola vez. Tarda ~10 minutos.
    Nueva cotización de {{from_name}} — Athlix Store
    ```
 5. En el cuerpo del correo (HTML o texto), pega esto:
+
    ```
    NUEVA SOLICITUD DE COTIZACIÓN — ATHLIX STORE
    ═══════════════════════════════════════════
@@ -57,6 +58,7 @@ Sigue estos pasos una sola vez. Tarda ~10 minutos.
    ───────────────────────────────────────────
    Enviado desde athlixstore.cl
    ```
+
 6. Clic en **Save**
 7. Copia el **Template ID** (algo como `template_xyz456`)
 

@@ -336,6 +336,7 @@
   <div class="login-box">
     <div class="login-logo">ATHLIX <span>ADMIN</span></div>
     <p class="login-sub">Panel de administración</p>
+    <input type="email" id="email-input" placeholder="Email" onkeydown="if(event.key==='Enter') doLogin()">
     <input type="password" id="pwd-input" placeholder="Contraseña" onkeydown="if(event.key==='Enter') doLogin()">
     <button class="btn-login" onclick="doLogin()">Entrar →</button>
     <div id="login-error"></div>
@@ -651,12 +652,12 @@ ATHLIX STORE SpA</textarea>
 // ════════════════════════════════════════════════════════════════
 //  CONFIGURACIÓN
 // ════════════════════════════════════════════════════════════════
-const SUPABASE_URL   = 'PEGA_TU_URL_AQUI';
-const SUPABASE_KEY   = 'PEGA_TU_CLAVE_AQUI';
-const ADMIN_PASSWORD = 'athlix2025';   // ← Cambia tu contraseña aquí
+const SUPABASE_URL = 'https://fyuhmedgyauvkfwswlnx.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5dWhtZWRneWF1dmtmd3N3bG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjYyMTgsImV4cCI6MjA5MDg0MjIxOH0.abJScOhhwxPLfpPU4bO44C8AwqTcbMqyUkqatGX6ceg';
 // ════════════════════════════════════════════════════════════════
 
-let sb = null, supabaseOk = false;
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseOk = true;
 let productos = [], cotizaciones = [], cotizFilter = 'todas';
 let currentEditId = null, deleteTargetId = null;
 let currentTags = [], formStockValue = true, currentImgUrl = null;
@@ -664,30 +665,44 @@ let currentCotizId = null;
 // items editor: array de { code, description, category, qty, unit, unit_price, discount }
 let editorItems = [];
 
+// ── Verificar sesión activa al cargar ─────────────────────────
+(async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main').style.display = 'block';
+    loadProducts();
+    loadCotizaciones();
+  }
+})();
+
 // ── Login ──────────────────────────────────────────────────────
-function doLogin() {
-  const pwd = document.getElementById('pwd-input').value;
-  if (pwd !== ADMIN_PASSWORD) {
-    document.getElementById('login-error').textContent = 'Contraseña incorrecta';
+async function doLogin() {
+  const email = document.getElementById('email-input').value.trim();
+  const pwd   = document.getElementById('pwd-input').value;
+  const errEl = document.getElementById('login-error');
+  errEl.textContent = '';
+  if (!email || !pwd) { errEl.textContent = 'Ingresa email y contraseña'; return; }
+  const btn = document.querySelector('.btn-login');
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pwd });
+  btn.disabled = false; btn.textContent = 'Entrar →';
+  if (error) {
+    errEl.textContent = 'Credenciales incorrectas';
     document.getElementById('pwd-input').value = '';
     return;
   }
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('main').style.display = 'block';
-  supabaseOk = initSB();
-  if (!supabaseOk) document.getElementById('setup-banner').style.display = 'block';
   loadProducts();
   loadCotizaciones();
 }
-function logout() {
+async function logout() {
+  await sb.auth.signOut();
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('main').style.display = 'none';
+  document.getElementById('email-input').value = '';
   document.getElementById('pwd-input').value = '';
-}
-function initSB() {
-  if (SUPABASE_URL === 'PEGA_TU_URL_AQUI') return false;
-  try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); return true; }
-  catch(e) { return false; }
 }
 
 // ── Tabs ───────────────────────────────────────────────────────
@@ -745,7 +760,7 @@ function cardHTML(p) {
       </div>
       <div class="card-actions">
         <button class="btn-edit" onclick="openModal(${p.id})">✏️ Editar</button>
-        <button class="btn-delete" onclick="askDelete(${p.id},'${p.name.replace(/'/g,"\\'")}')">🗑</button>
+        <button class="btn-delete" onclick="askDelete(${p.id})">🗑</button>
       </div>
     </div>
   </div>`;
@@ -855,9 +870,11 @@ async function saveProduct() {
   finally{btn.disabled=false;btn.textContent=currentEditId?'Guardar cambios':'Guardar producto';}
 }
 
-function askDelete(id,name) {
+function askDelete(id) {
   deleteTargetId=id;
-  document.getElementById('confirm-name').textContent=`"${name}" será eliminado.`;
+  const p = productos.find(x => x.id === id);
+  const safeName = p ? p.name : 'este producto';
+  document.getElementById('confirm-name').textContent=`"${safeName}" será eliminado.`;
   document.getElementById('confirm-overlay').style.display='flex';
 }
 function closeConfirm() { deleteTargetId=null; document.getElementById('confirm-overlay').style.display='none'; }

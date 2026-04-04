@@ -795,6 +795,26 @@
   .footer-methods { display: flex; gap: 8px; align-items: center; }
   .payment-method { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 5px; padding: 5px 10px; font-size: 11px; font-weight: 600; color: rgba(245,245,245,0.35); letter-spacing: 0.04em; }
   /* ─── MOBILE NAV ─── */
+  /* ─── MENÚ MOBILE ─── */
+  .mobile-menu {
+    display: none;
+    position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 199;
+    background: var(--dark-surface);
+    flex-direction: column;
+    padding: 12px 0 20px;
+    border-bottom: 2px solid var(--blue);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    padding: 14px 24px;
+    font-size: 16px; font-weight: 600;
+    color: rgba(245,245,245,0.85);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu a:active { background: rgba(255,255,255,0.05); }
+
   @media (max-width: 900px) {
     .nav-links, .nav-search { display: none; }
     .hamburger { display: flex; flex-direction: column; gap: 5px; cursor: pointer; padding: 8px; }
@@ -810,11 +830,26 @@
     .contact-layout { grid-template-columns: 1fr; }
     .form-grid { grid-template-columns: 1fr; }
     .abono-banner { grid-template-columns: 1fr; }
+    .products-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   }
   @media (max-width: 600px) {
     .footer-top { grid-template-columns: 1fr; }
     .hero-stats { gap: 1.5rem; }
-    .hero-title { font-size: 48px; }
+    .hero-title { font-size: 42px; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .product-info { padding: 12px; }
+    .product-name { font-size: 13px; }
+    .price-main { font-size: 16px; }
+    .add-to-cart { width: 36px; height: 36px; font-size: 18px; }
+    .section-title { font-size: 28px; }
+    .toast { bottom: 12px; right: 12px; left: 12px; font-size: 13px; }
+    .cart-drawer { width: 100vw; max-width: 100vw; }
+    .detail-layout { gap: 20px; }
+    input, select, textarea { font-size: 16px; } /* evita zoom en iOS */
+  }
+  @media (max-width: 380px) {
+    .products-grid { grid-template-columns: 1fr; }
+    .hero-title { font-size: 36px; }
   }
   /* ─── TOAST ─── */
   .toast {
@@ -832,6 +867,7 @@
     border-left: 3px solid var(--blue);
   }
   .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.show.error { background: var(--accent); border-left-color: #FCA5A5; }
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--gray-100); }
@@ -1207,6 +1243,14 @@
     </button>
   </div>
 </nav>
+<!-- ─── MENÚ MOBILE ─── -->
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#" onclick="showSection('home'); setActive(document.querySelectorAll('.nav-links a')[0]); closeMobileMenu()">Inicio</a>
+  <a href="#" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1]); closeMobileMenu()">Catálogo</a>
+  <a href="#" onclick="showSection('about'); setActive(document.querySelectorAll('.nav-links a')[2]); closeMobileMenu()">Nosotros</a>
+  <a href="#" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3]); closeMobileMenu()">Cotización</a>
+  <a href="#" onclick="openCart(); closeMobileMenu()" style="color:var(--blue)">🛒 Carrito</a>
+</div>
 <div class="page">
 <!-- ═══════════════════════════════════════════ HOME ═══════ -->
 <section class="active" id="home">
@@ -1832,8 +1876,8 @@
 // ════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN SUPABASE — Pega aquí los datos de tu proyecto
 // ════════════════════════════════════════════════════════════════
-const SUPABASE_URL = 'PEGA_TU_URL_AQUI';   // Ej: https://xyzabc.supabase.co
-const SUPABASE_KEY = 'PEGA_TU_CLAVE_AQUI'; // Clave "anon public" de Supabase
+const SUPABASE_URL = 'https://fyuhmedgyauvkfwswlnx.supabase.co';   // Ej: https://xyzabc.supabase.co
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ5dWhtZWRneWF1dmtmd3N3bG54Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNjYyMTgsImV4cCI6MjA5MDg0MjIxOH0.abJScOhhwxPLfpPU4bO44C8AwqTcbMqyUkqatGX6ceg'; // Clave "anon public" de Supabase
 // ════════════════════════════════════════════════════════════════
 
 // Productos de respaldo (se usan si Supabase no está configurado)
@@ -1874,12 +1918,11 @@ function normalize(row) {
 }
 
 let products = [...localProducts];
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// Carga productos desde Supabase si está configurado
+// Carga productos desde Supabase
 async function initProducts() {
-  if (SUPABASE_URL === 'PEGA_TU_URL_AQUI') return;
   try {
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     const { data, error } = await sb.from('products').select('*').order('id');
     if (!error && data && data.length > 0) {
       products = data.filter(p => p.in_stock !== false).map(normalize);
@@ -1931,6 +1974,10 @@ async function sendCotizacion(e) {
 
   const name     = document.getElementById('cq-name').value.trim();
   const email    = document.getElementById('cq-email').value.trim();
+
+  if (!name) { showToast('El nombre es obligatorio', true); return; }
+  if (!email) { showToast('El email es obligatorio', true); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Ingresa un email válido', true); return; }
   const phone    = document.getElementById('cq-phone').value.trim() || 'No indicado';
   const tipo     = document.getElementById('cq-tipo').value;
   const cantidad = document.getElementById('cq-qty').value;
@@ -1955,10 +2002,8 @@ async function sendCotizacion(e) {
   btn.textContent = 'Enviando...';
 
   // 1. Guardar en Supabase
-  if (SUPABASE_URL !== 'PEGA_TU_URL_AQUI') {
-    try {
-      const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      await sb.from('quotations').insert({
+  try {
+    await sb.from('quotations').insert({
         cot_number:        cotNum,
         status:            'pendiente',
         client_name:       name,
@@ -1970,9 +2015,8 @@ async function sendCotizacion(e) {
         region:            region,
         message:           mensaje,
       });
-    } catch(err) {
-      console.warn('No se pudo guardar en Supabase:', err.message);
-    }
+  } catch(err) {
+    console.warn('No se pudo guardar en Supabase:', err.message);
   }
 
   // 2. Enviar email via EmailJS
@@ -2125,29 +2169,12 @@ function showDetail(id) {
         <div class="abono-icon">💳</div>
         <div class="abono-text"><strong>Pago en abonos disponible.</strong><br>${p.abono} · Sin intereses · Cuotas a convenir</div>
       </div>
-      <div class="detail-section-title">Talla</div>
-      <div class="talla-grid">
-        <button class="talla-btn" onclick="selectTalla(this)">XS</button>
-        <button class="talla-btn active" onclick="selectTalla(this)">S</button>
-        <button class="talla-btn" onclick="selectTalla(this)">M</button>
-        <button class="talla-btn" onclick="selectTalla(this)">L</button>
-        <button class="talla-btn" onclick="selectTalla(this)">XL</button>
-        <button class="talla-btn unavailable">XXL</button>
-      </div>
-      <div class="detail-section-title">Color</div>
-      <div class="color-grid">
-        <div class="color-swatch active" style="background:#0057FF" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#0a0a0a" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#00C851" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#FF3B30" onclick="selectColor(this)"></div>
-        <div class="color-swatch" style="background:#ffffff; border: 1.5px solid var(--gray-200)" onclick="selectColor(this)"></div>
-      </div>
       <div class="detail-section-title">Cantidad</div>
       <div class="qty-control">
         <button class="qty-btn" onclick="changeQty(-1)">−</button>
         <div class="qty-num" id="qty-num">1</div>
         <button class="qty-btn" onclick="changeQty(1)">+</button>
-        <span style="font-size:13px; color:var(--gray-400)">Stock disponible</span>
+        <span style="font-size:13px; color:${p.inStock ? 'var(--green)' : 'var(--accent)'}; font-weight:600">${p.inStock ? '✓ En stock' : '✗ Sin stock'}</span>
       </div>
       <div class="detail-ctas">
         <button class="btn-primary" onclick="openPaymentModal(${p.id})">💳 Comprar con abono</button>
@@ -2173,17 +2200,23 @@ function changeQty(d) {
   const el = document.getElementById('qty-num');
   if (el) el.textContent = qty;
 }
-function selectTalla(btn) {
-  if (btn.classList.contains('unavailable')) return;
-  btn.closest('.talla-grid').querySelectorAll('.talla-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-function selectColor(swatch) {
-  swatch.closest('.color-grid').querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-  swatch.classList.add('active');
-}
 // ─── CART ───
+function loadCart() {
+  try { return JSON.parse(localStorage.getItem('athlix_cart') || '[]'); } catch { return []; }
+}
+function saveCart() {
+  localStorage.setItem('athlix_cart', JSON.stringify(cart.map(i => ({ id: i.product.id, qty: i.qty }))));
+}
+function restoreCart() {
+  const saved = loadCart();
+  saved.forEach(({ id, qty }) => {
+    const p = products.find(x => x.id === id);
+    if (p) cart.push({ product: p, qty });
+  });
+  updateCartBadge();
+}
 let cart = [];
+restoreCart();
 
 function openCart() {
   renderCart();
@@ -2204,6 +2237,7 @@ function addCart(productId) {
   const existing = cart.find(item => item.product.id === productId);
   if (existing) { existing.qty++; }
   else { cart.push({ product: p, qty: 1 }); }
+  saveCart();
   updateCartBadge();
   renderCart();
   const shortName = p.name.length > 26 ? p.name.substring(0,26)+'...' : p.name;
@@ -2212,6 +2246,7 @@ function addCart(productId) {
 
 function removeFromCart(productId) {
   cart = cart.filter(item => item.product.id !== productId);
+  saveCart();
   updateCartBadge();
   renderCart();
 }
@@ -2221,7 +2256,7 @@ function updateCartQty(productId, delta) {
   if (!item) return;
   item.qty = Math.max(0, item.qty + delta);
   if (item.qty === 0) removeFromCart(productId);
-  else { updateCartBadge(); renderCart(); }
+  else { saveCart(); updateCartBadge(); renderCart(); }
 }
 
 function updateCartBadge() {
@@ -2265,12 +2300,22 @@ function addWish(el) {
   if (el.textContent === '♥') el.style.color = '#FF3B30';
   else el.style.color = '';
 }
+// ─── MOBILE MENU ───
+function toggleMobileMenu() {
+  document.getElementById('mobile-menu').classList.toggle('open');
+}
+function closeMobileMenu() {
+  document.getElementById('mobile-menu').classList.remove('open');
+}
+// cerrar menú al hacer scroll
+window.addEventListener('scroll', closeMobileMenu, { passive: true });
+
 // ─── TOAST ───
-function showToast(msg) {
+function showToast(msg, isError = false) {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  t.className = isError ? 'show error' : 'show';
+  setTimeout(() => t.className = '', 3500);
 }
 // ─── FORMSPREE ───
 async function handleFormSubmit(e) {

@@ -70,19 +70,23 @@ CREATE TABLE IF NOT EXISTS quotations (
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE quotations ENABLE ROW LEVEL SECURITY;
 
--- Productos: lectura pública, escritura solo admin
+-- Productos: lectura pública, escritura solo admin autenticado
+DROP POLICY IF EXISTS "Lectura pública productos" ON products;
+DROP POLICY IF EXISTS "Escritura admin productos" ON products;
+
 CREATE POLICY "Lectura pública productos" ON products
   FOR SELECT USING (true);
 CREATE POLICY "Escritura admin productos" ON products
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING (auth.role() = 'authenticated');
 
--- Cotizaciones: solo admin puede leer y escribir
--- El formulario web inserta con la service_role key (desde el admin)
--- O bien con política abierta para INSERT desde la web:
+-- Cotizaciones: inserción pública (formulario web), gestión solo admin autenticado
+DROP POLICY IF EXISTS "Insertar cotización desde web" ON quotations;
+DROP POLICY IF EXISTS "Admin gestiona cotizaciones" ON quotations;
+
 CREATE POLICY "Insertar cotización desde web" ON quotations
   FOR INSERT WITH CHECK (true);
 CREATE POLICY "Admin gestiona cotizaciones" ON quotations
-  FOR ALL USING (auth.role() = 'service_role');
+  FOR ALL USING (auth.role() = 'authenticated');
 
 -- ── 4. FUNCIÓN PARA ACTUALIZAR updated_at ───────────────────────
 CREATE OR REPLACE FUNCTION update_updated_at()
