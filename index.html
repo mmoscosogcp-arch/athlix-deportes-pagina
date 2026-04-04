@@ -127,7 +127,6 @@
     transition: color 0.2s;
   }
   .nav-icon-btn:hover { color: var(--white); }
-  .hamburger { display: none; }
   /* ─── PAGE WRAPPER ─── */
   .page { padding-top: var(--nav-h); }
   /* ─── SECTION TRANSITIONS ─── */
@@ -797,25 +796,9 @@
   .footer-copy { font-size: 12px; color: rgba(245,245,245,0.25); }
   .footer-methods { display: flex; gap: 8px; align-items: center; }
   .payment-method { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.07); border-radius: 5px; padding: 5px 10px; font-size: 11px; font-weight: 600; color: rgba(245,245,245,0.35); letter-spacing: 0.04em; }
-  /* ─── MENÚ MOBILE ─── */
-  .mobile-backdrop {
-    display: none;
-    position: fixed; inset: 0; z-index: 198;
-    background: rgba(0,0,0,0.5);
-  }
-  .mobile-backdrop.open { display: block; }
-
-  .mobile-menu {
-    position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 199;
-    background: var(--dark-surface);
-    flex-direction: column;
-    border-bottom: 3px solid var(--blue);
-    box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-    transform: translateY(-110%);
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    display: flex;
-  }
-  .mobile-menu.open { transform: translateY(0); }
+  /* ─── MENÚ MOBILE — invisible en desktop ─── */
+  .mobile-backdrop { display: none; }
+  .mobile-menu     { display: none; }
 
   .mobile-menu-header {
     padding: 16px 20px 10px;
@@ -858,6 +841,35 @@
     .nav-links, .nav-search { display: none; }
     .hamburger { display: flex; }
     .nav { gap: 0.75rem; padding: 0 4vw; }
+
+    /* Backdrop */
+    .mobile-backdrop {
+      display: block;
+      position: fixed; inset: 0; z-index: 198;
+      background: rgba(0,0,0,0.55);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .mobile-backdrop.open { opacity: 1; pointer-events: all; }
+
+    /* Menú desplegable */
+    .mobile-menu {
+      display: flex;
+      flex-direction: column;
+      position: fixed; top: var(--nav-h); left: 0; right: 0; z-index: 199;
+      background: var(--dark-surface);
+      border-bottom: 3px solid var(--blue);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+      transform: translateY(-110%);
+      visibility: hidden;
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1), visibility 0.3s;
+      pointer-events: none;
+    }
+    .mobile-menu.open {
+      transform: translateY(0);
+      visibility: visible;
+      pointer-events: all;
+    }
     .hero { grid-template-columns: 1fr; min-height: auto; }
     .hero-right { display: none; }
     .hero-left { padding: 40px 5vw; }
