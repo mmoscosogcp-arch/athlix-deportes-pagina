@@ -1219,12 +1219,27 @@
   .cotiz-step-text span { font-size: 12px; color: rgba(245,245,245,0.5); }
   .cotiz-guarantee {
     display: flex; gap: 12px; align-items: center;
-    background: rgba(242,106,33,0.1); border: 1px solid rgba(242,106,33,0.25);
-    border-radius: 10px; padding: 16px;
+    background: var(--surface); border: 1px solid var(--gray-200);
+    border-left: 3px solid var(--blue);
+    border-radius: 10px; padding: 14px 16px;
   }
-  .cotiz-guarantee-icon { font-size: 28px; flex-shrink: 0; }
-  .cotiz-guarantee-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--white); margin-bottom: 2px; }
-  .cotiz-guarantee-text span { font-size: 12px; color: rgba(245,245,245,0.5); }
+  .cotiz-guarantee-icon { font-size: 24px; flex-shrink: 0; }
+  .cotiz-guarantee-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+  .cotiz-guarantee-text span { font-size: 12px; color: var(--text-2); line-height: 1.5; }
+  /* ─── CONTACTO INFO COTIZ ─── */
+  .cotiz-contact-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.08);
+    font-size: 14px; color: rgba(245,245,245,0.85);
+  }
+  .cotiz-contact-item:last-child { border-bottom: none; }
+  .cotiz-contact-item a { color: var(--blue); }
+  .cotiz-contact-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+  .cotiz-map {
+    border-radius: var(--radius); overflow: hidden;
+    border: 1px solid var(--gray-200); height: 180px;
+  }
+  .cotiz-map iframe { width: 100%; height: 100%; border: none; display: block; }
 
   .cotiz-form-card {
     background: white; border-radius: var(--radius); padding: 32px;
@@ -1599,44 +1614,52 @@
 
     <div class="cotiz-layout">
 
-      <!-- Columna izquierda: info -->
+      <!-- Columna izquierda: contacto -->
       <div class="cotiz-info">
         <div class="cotiz-info-card">
-          <h3>¿Cómo funciona?</h3>
-          <div class="cotiz-step">
-            <div class="cotiz-step-num">1</div>
-            <div class="cotiz-step-text">
-              <strong>Completas el formulario</strong>
-              <span>Nos cuentas qué necesitas y tus datos de contacto</span>
-            </div>
+          <h3>Contáctanos</h3>
+          <div class="cotiz-contact-item">
+            <span class="cotiz-contact-icon">🌐</span>
+            <span>www.athlix.cl</span>
           </div>
-          <div class="cotiz-step">
-            <div class="cotiz-step-num">2</div>
-            <div class="cotiz-step-text">
-              <strong>Te enviamos cotización</strong>
-              <span>En menos de 24 horas, detallada con precios y opciones</span>
-            </div>
+          <div class="cotiz-contact-item">
+            <span class="cotiz-contact-icon">📷</span>
+            <a href="https://instagram.com/athlix.store" target="_blank">@athlix.store</a>
           </div>
-          <div class="cotiz-step">
-            <div class="cotiz-step-num">3</div>
-            <div class="cotiz-step-text">
-              <strong>Confirmas y coordinamos</strong>
-              <span>Acordamos plazo de entrega, instalación y forma de pago</span>
-            </div>
+          <div class="cotiz-contact-item">
+            <span class="cotiz-contact-icon">📧</span>
+            <a href="mailto:athlixchile@gmail.com">athlixchile@gmail.com</a>
+          </div>
+          <div class="cotiz-contact-item">
+            <span class="cotiz-contact-icon">📞</span>
+            <a href="tel:+56964329683">+56 9 6432 9683</a>
+          </div>
+          <div class="cotiz-contact-item">
+            <span class="cotiz-contact-icon">📍</span>
+            <span>Av. Providencia 1234, Providencia, Santiago</span>
           </div>
         </div>
+
+        <div class="cotiz-map">
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-70.6206%2C-33.4380%2C-70.6006%2C-33.4280&amp;layer=mapnik&amp;marker=-33.4330%2C-70.6106"
+            title="Ubicación Athlix Store"
+            loading="lazy">
+          </iframe>
+        </div>
+
         <div class="cotiz-guarantee">
           <div class="cotiz-guarantee-icon">🤝</div>
           <div class="cotiz-guarantee-text">
             <strong>Sin compromiso de compra</strong>
-            <span>La cotización es completamente gratis. Decides tú.</span>
+            <span>La cotización es completamente gratis. Tú decides si continúas.</span>
           </div>
         </div>
         <div class="cotiz-guarantee">
-          <div class="cotiz-guarantee-icon">💳</div>
+          <div class="cotiz-guarantee-icon">💰</div>
           <div class="cotiz-guarantee-text">
-            <strong>Pago en cuotas disponible</strong>
-            <span>Financiamiento directo, sin banco ni tarjeta de crédito.</span>
+            <strong>Flexibilidad de pago</strong>
+            <span>50% al inicio del proyecto · 50% contra entrega.</span>
           </div>
         </div>
         <div class="cotiz-guarantee">
@@ -1779,6 +1802,18 @@
   </div>
 </section>
 </div><!-- end .page -->
+<!-- ─── MODAL AYUDA ─── -->
+<div class="modal-overlay" id="help-modal" onclick="if(event.target===this) closeHelpModal()">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeHelpModal()">✕</button>
+      <div class="modal-title" id="help-modal-title"></div>
+      <div class="modal-subtitle" id="help-modal-sub"></div>
+    </div>
+    <div id="help-modal-body"></div>
+  </div>
+</div>
+
 <!-- ─── CART DRAWER ─── -->
 <div class="cart-overlay" id="cart-overlay">
   <div class="cart-drawer">
@@ -1921,19 +1956,17 @@
         <div class="footer-col-title">Empresa</div>
         <div class="footer-links">
           <a href="#" onclick="showSection('about')">Sobre nosotros</a>
-          <a href="#" onclick="showSection('contact')">Contacto</a>
-          <a href="#">Trabaja con nosotros</a>
-          <a href="#">Cotización masiva</a>
+          <a href="#" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])">Contacto</a>
+          <a href="#" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])">Cotización masiva</a>
         </div>
       </div>
       <div>
         <div class="footer-col-title">Ayuda</div>
         <div class="footer-links">
-          <a href="#">Cómo comprar</a>
-          <a href="#">Pago en abonos</a>
-          <a href="#">Envíos y plazos</a>
-          <a href="#">Cambios y devoluciones</a>
-          <a href="#">Preguntas frecuentes</a>
+          <a href="#" onclick="openHelpModal('como-comprar')">Cómo comprar</a>
+          <a href="#" onclick="openHelpModal('pago-abonos')">Pago en abonos</a>
+          <a href="#" onclick="openHelpModal('envios')">Envíos y plazos</a>
+          <a href="#" onclick="openHelpModal('faq')">Preguntas frecuentes</a>
         </div>
       </div>
     </div>
@@ -2534,6 +2567,126 @@ function confirmOrder() {
   }
   addCart();
 }
+// ─── MODAL AYUDA ───
+const helpContent = {
+  'como-comprar': {
+    title: 'Cómo comprar',
+    sub: 'Proceso simple en 3 pasos',
+    body: `
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px">1</div>
+          <div><strong style="display:block;margin-bottom:4px">Solicita tu cotización</strong><span style="font-size:13px;color:var(--text-2)">Completa el formulario de contacto con los productos que necesitas. Te respondemos con una cotización detallada en menos de 24 horas hábiles.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px">2</div>
+          <div><strong style="display:block;margin-bottom:4px">Confirmas y coordinas el pago</strong><span style="font-size:13px;color:var(--text-2)">Una vez aprobada la cotización, realizas una transferencia bancaria del 50% para iniciar la fabricación. El saldo restante se cancela al momento de la entrega.</span></div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:flex-start">
+          <div style="min-width:32px;height:32px;background:var(--blue);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:800;font-size:13px">3</div>
+          <div><strong style="display:block;margin-bottom:4px">Recibe tu pedido</strong><span style="font-size:13px;color:var(--text-2)">Coordinamos el despacho e instalación según tu región. Te avisamos con anticipación la fecha de entrega.</span></div>
+        </div>
+        <div style="background:var(--gray-100);border-radius:10px;padding:14px;font-size:13px;color:var(--text-2);margin-top:4px">
+          💬 <strong>¿Tienes dudas?</strong> Escríbenos directamente por WhatsApp al <a href="tel:+56964329683" style="color:var(--blue)">+56 9 6432 9683</a> y te ayudamos.
+        </div>
+      </div>`
+  },
+  'pago-abonos': {
+    title: 'Pago en abonos',
+    sub: 'Flexibilidad para tu proyecto',
+    body: `
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7">Sabemos que equipar un espacio deportivo representa una inversión importante. Por eso ofrecemos un esquema de pago flexible que se adapta a tu presupuesto.</p>
+        <div style="background:var(--blue-light);border:1px solid var(--blue);border-radius:12px;padding:18px">
+          <div style="font-size:13px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:12px">Esquema de pago estándar</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <div style="flex:1;min-width:120px;background:white;border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:var(--blue);font-family:var(--font-display)">50%</div>
+              <div style="font-size:12px;font-weight:700;margin-top:4px">Al iniciar</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:2px">Inicio de fabricación</div>
+            </div>
+            <div style="flex:1;min-width:120px;background:white;border-radius:8px;padding:14px;text-align:center">
+              <div style="font-size:28px;font-weight:900;color:var(--black);font-family:var(--font-display)">50%</div>
+              <div style="font-size:12px;font-weight:700;margin-top:4px">Contra entrega</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:2px">Al recibir el pedido</div>
+            </div>
+          </div>
+        </div>
+        <p style="font-size:13px;color:var(--text-2);line-height:1.7">Para pedidos institucionales o de mayor volumen, podemos evaluar condiciones especiales. Consulta directamente con nuestro equipo.</p>
+      </div>`
+  },
+  'envios': {
+    title: 'Envíos y plazos',
+    sub: 'Despachamos a todo Chile',
+    body: `
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <p style="font-size:14px;color:var(--text-2);line-height:1.7">Los plazos de fabricación y entrega varían según el tipo de producto, la cantidad solicitada y la región de destino.</p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
+            <span style="font-size:20px">🏗️</span>
+            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Fabricación</strong><span style="font-size:12px;color:var(--text-2)">Entre 5 y 15 días hábiles dependiendo de la complejidad y cantidad del pedido. Te informamos el plazo exacto en la cotización.</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
+            <span style="font-size:20px">🚚</span>
+            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Despacho Región Metropolitana</strong><span style="font-size:12px;color:var(--text-2)">Entrega directa con instalación incluida. Coordinamos fecha y horario contigo.</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
+            <span style="font-size:20px">📦</span>
+            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Regiones</strong><span style="font-size:12px;color:var(--text-2)">Despachamos a todo Chile vía transportista. El costo de envío se cotiza según región y peso del pedido.</span></div>
+          </div>
+        </div>
+        <div style="background:var(--gray-100);border-radius:10px;padding:14px;font-size:13px;color:var(--text-2)">
+          ⚠️ Los plazos pueden variar en temporada alta. Consulta disponibilidad al momento de cotizar.
+        </div>
+      </div>`
+  },
+  'faq': {
+    title: 'Preguntas frecuentes',
+    sub: 'Resolvemos tus dudas',
+    body: `
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <details style="background:var(--gray-100);border-radius:10px;padding:14px;cursor:pointer">
+          <summary style="font-weight:700;font-size:14px;list-style:none">¿Fabrican a medida?</summary>
+          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">Sí, todos nuestros productos se fabrican según los requerimientos del cliente. Puedes solicitar medidas personalizadas en tu cotización.</p>
+        </details>
+        <details style="background:var(--gray-100);border-radius:10px;padding:14px;cursor:pointer">
+          <summary style="font-weight:700;font-size:14px;list-style:none">¿Emiten boleta o factura?</summary>
+          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">Sí, emitimos boleta electrónica y factura para instituciones (colegios, municipalidades, clubes). Indícalo en tu cotización.</p>
+        </details>
+        <details style="background:var(--gray-100);border-radius:10px;padding:14px;cursor:pointer">
+          <summary style="font-weight:700;font-size:14px;list-style:none">¿Hacen instalación?</summary>
+          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">En la Región Metropolitana incluimos instalación sin costo adicional. En regiones se coordina según el pedido.</p>
+        </details>
+        <details style="background:var(--gray-100);border-radius:10px;padding:14px;cursor:pointer">
+          <summary style="font-weight:700;font-size:14px;list-style:none">¿Tienen garantía los productos?</summary>
+          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">Todos nuestros productos tienen garantía por defectos de fabricación. Consulta condiciones específicas en tu cotización.</p>
+        </details>
+
+        <div style="background:var(--blue-light);border:1px solid var(--blue);border-radius:12px;padding:16px;margin-top:4px">
+          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px">💡 ¿Tienes otra pregunta o sugerencia?</div>
+          <p style="font-size:13px;color:var(--text-2);margin-bottom:10px;line-height:1.6">Escríbenos y la consideramos para mejorar nuestro servicio.</p>
+          <a href="mailto:athlixchile@gmail.com?subject=Sugerencia / Pregunta" style="display:inline-block;background:var(--blue);color:white;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:700">Enviar sugerencia →</a>
+        </div>
+      </div>`
+  }
+};
+
+function openHelpModal(key) {
+  const c = helpContent[key];
+  if (!c) return;
+  document.getElementById('help-modal-title').textContent = c.title;
+  document.getElementById('help-modal-sub').textContent = c.sub;
+  document.getElementById('help-modal-body').innerHTML = c.body;
+  document.getElementById('help-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeHelpModal() {
+  document.getElementById('help-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// cerrar con Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeHelpModal(); });
+
 // ─── INIT ───
 renderCatalog(products);
 </script>
