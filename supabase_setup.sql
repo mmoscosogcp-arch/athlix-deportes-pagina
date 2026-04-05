@@ -20,8 +20,13 @@ CREATE TABLE IF NOT EXISTS products (
   abono       TEXT,
   description TEXT,
   in_stock    BOOLEAN DEFAULT TRUE,
+  show_price  BOOLEAN DEFAULT TRUE,             -- false = "Precio a cotizar"
+  stock_qty   INTEGER,
   created_at  TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Columna nueva (ejecutar si la tabla ya existe)
+ALTER TABLE products ADD COLUMN IF NOT EXISTS show_price BOOLEAN DEFAULT TRUE;
 
 -- ── 2. TABLA DE COTIZACIONES ─────────────────────────────────────
 CREATE TABLE IF NOT EXISTS quotations (
@@ -193,3 +198,51 @@ CREATE POLICY "Subida pública fotos cotización" ON storage.objects
 CREATE POLICY "Lectura pública fotos cotización" ON storage.objects
   FOR SELECT TO public
   USING (bucket_id = 'cotizaciones-fotos');
+
+-- ── 11. TABLA DE PAGOS ───────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS payments (
+  id              BIGSERIAL PRIMARY KEY,
+  quotation_id    BIGINT REFERENCES quotations(id) ON DELETE SET NULL,
+  cot_number      TEXT,                              -- copia para display rápido
+  client_email    TEXT NOT NULL,
+  client_name     TEXT NOT NULL,
+  client_rut      TEXT,                              -- RUT empresa/persona
+  client_company  TEXT,                              -- Razón social
+
+  description     TEXT NOT NULL,                     -- "Abono 1 de 2", "Saldo final", etc.
+  amount          INTEGER NOT NULL,                  -- monto en CLP
+  due_date        DATE,                              -- fecha límite de pago
+  paid_date       DATE,                              -- fecha en que pagó (null = pendiente)
+
+  status          TEXT DEFAULT 'pendiente',
+  -- pendiente  → aún no paga
+  -- pagado     → pago recibido y confirmado
+  -- vencido    → pasó la due_date sin pagar (calculado en app)
+  -- parcial    → pagó parte del monto
+
+  payment_method  TEXT,                              -- transferencia | flow | webpay | efectivo | mercadopago
+  reference       TEXT,                              -- N° de transferencia, comprobante, etc.
+  amount_paid     INTEGER DEFAULT 0,                 -- cuánto pagó efectivamente (para pagos parciales)
+  notes           TEXT,                              -- notas internas del admin
+
+  -- Para futura integración SII
+  invoice_number  TEXT,                              -- N° boleta/factura electrónica (cuando esté disponible)
+  invoice_type    TEXT,                              -- 'boleta' | 'factura'
+
+  created_at      TIMESTAMPTZ DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Columnas nuevas (ejecutar si la tabla ya existe)
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS client_rut     TEXT;
+ALTER TABLE payments ADD COLUMN IF NOT EXISTS client_company TEXT;
+
+ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Admin gestiona pagos" ON payments;
+CREATE POLICY "Admin gestiona pagos" ON payments
+  FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE TRIGGER payments_updated_at
+  BEFORE UPDATE ON payments
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at();

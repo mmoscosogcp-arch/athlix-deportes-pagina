@@ -33,6 +33,8 @@
     --blue: #F26A21;
     --blue-dark: #D4561A;
     --blue-light: #FFF0E8;
+    --orange: #F26A21;
+    --orange-dark: #D4561A;
     --yellow: #FFB703;
     --green: #16A34A;
     --green-dark: #15803D;
@@ -203,7 +205,7 @@
   }
   .hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; }
   .btn-primary {
-    background: var(--blue);
+    background: var(--orange);
     color: #fff;
     padding: 14px 30px;
     border-radius: 9px;
@@ -211,7 +213,7 @@
     transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
     display: inline-flex; align-items: center; gap: 8px;
   }
-  .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,106,33,0.35); }
+  .btn-primary:hover { background: var(--orange); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(242,106,33,0.35); }
   .btn-secondary {
     background: transparent;
     color: var(--white);
@@ -444,7 +446,7 @@
   .price-old { font-size: 12px; color: var(--gray-400); text-decoration: line-through; }
   .price-abono { font-size: 11px; color: var(--green); font-weight: 600; margin-top: 3px; }
   .add-to-cart {
-    background: var(--blue);
+    background: var(--orange);
     color: white;
     border-radius: 8px;
     width: 38px; height: 38px;
@@ -453,7 +455,7 @@
     transition: background 0.2s, transform 0.15s;
     flex-shrink: 0;
   }
-  .add-to-cart:hover { background: var(--blue-dark); transform: scale(1.08); }
+  .add-to-cart:hover { background: var(--orange); transform: scale(1.08); }
   /* ─── BENEFITS ─── */
   .benefits-grid {
     display: grid;
@@ -1067,13 +1069,13 @@
   }
   .cart-checkout-btn {
     width: 100%; padding: 15px;
-    background: var(--blue); color: white; border: none;
+    background: var(--orange); color: white; border: none;
     border-radius: 10px; font-size: 15px; font-weight: 600;
     font-family: var(--font-body); cursor: pointer;
     transition: background 0.2s, transform 0.15s;
     margin-bottom: 10px;
   }
-  .cart-checkout-btn:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .cart-checkout-btn:hover { background: var(--orange); transform: translateY(-1px); }
   .cart-continue-btn {
     width: 100%; padding: 11px;
     background: transparent; color: var(--text-2);
@@ -1178,13 +1180,13 @@
   }
   .modal-btn-confirm {
     width: 100%; padding: 15px;
-    background: var(--blue); color: white; border: none;
+    background: var(--orange); color: white; border: none;
     border-radius: 10px; font-size: 15px; font-weight: 700;
     font-family: var(--font-body); cursor: pointer;
     letter-spacing: 0.04em; text-transform: uppercase;
     transition: background 0.2s, transform 0.15s;
   }
-  .modal-btn-confirm:hover { background: var(--blue-dark); transform: translateY(-1px); }
+  .modal-btn-confirm:hover { background: var(--orange); transform: translateY(-1px); }
   .modal-steps { display: flex; gap: 8px; margin-bottom: 1.5rem; align-items: center; }
   .mstep {
     display: flex; align-items: center; gap: 6px;
@@ -1291,6 +1293,17 @@
   .cotiz-product-check:hover { border-color: var(--blue); background: var(--blue-light); }
   .cotiz-product-check input { accent-color: var(--blue); width: 15px; height: 15px; }
   .cotiz-product-check.checked { border-color: var(--blue); background: var(--blue-light); font-weight: 600; }
+  .cotiz-item-row {
+    display: grid; grid-template-columns: 1fr 80px auto; gap: 8px; align-items: center;
+    background: var(--white); border: 1.5px solid var(--gray-200); border-radius: 8px; padding: 8px 10px;
+  }
+  .cotiz-item-row select, .cotiz-item-row input { border: none; outline: none; background: transparent; font-size: 13px; font-family: var(--font-body); color: var(--text); padding: 2px 0; width: 100%; }
+  .cotiz-item-row .ci-qty { text-align: center; font-weight: 700; width: 60px; }
+  .cotiz-item-row .ci-remove { background: none; border: none; color: var(--gray-400); cursor: pointer; font-size: 16px; padding: 2px 4px; border-radius: 4px; transition: color .15s; }
+  .cotiz-item-row .ci-remove:hover { color: var(--accent); }
+  .cotiz-item-detail { grid-column: 1 / -1; border-top: 1px solid var(--gray-100); margin-top: 6px; padding-top: 6px; }
+  .cotiz-item-detail input { font-size: 12px; color: var(--text-2); }
+  @media (max-width: 500px) { .cotiz-item-row { grid-template-columns: 1fr 60px auto; } }
   .cotiz-doc-toggle {
     display: flex; gap: 12px; margin-top: 4px;
   }
@@ -1305,12 +1318,12 @@
   }
   .cotiz-doc-opt input { accent-color: var(--blue); width: 15px; height: 15px; }
   .cotiz-submit {
-    width: 100%; padding: 16px; background: var(--blue); color: white;
+    width: 100%; padding: 16px; background: var(--orange); color: white;
     border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
     cursor: pointer; transition: background 0.2s; margin-top: 6px;
     font-family: var(--font-body); letter-spacing: 0.02em;
   }
-  .cotiz-submit:hover { background: var(--blue-dark); }
+  .cotiz-submit:hover { background: var(--orange); }
   .cotiz-submit:disabled { opacity: 0.55; cursor: not-allowed; }
   .cotiz-note { text-align: center; font-size: 12px; color: var(--text-2); margin-top: 10px; }
   .cotiz-success {
@@ -1412,7 +1425,7 @@
       <div class="hero-img-placeholder">
         <img src="Catalogo/arco_3x2_dospulgadas.png" alt="Arco de fútbol Athlix">
       </div>
-      <div class="hero-floating-badge badge-top">✔ Envío gratis sobre $50.000</div>
+      <div class="hero-floating-badge badge-top">✔ Despacho a todo Chile</div>
       <div class="hero-floating-badge badge-bottom">💳 Pago flexible · Línea de crédito</div>
       <div class="hero-stripe"></div>
     </div>
@@ -1655,7 +1668,7 @@
           <h3>Contáctanos</h3>
           <div class="cotiz-contact-item">
             <span class="cotiz-contact-icon">🌐</span>
-            <span>www.athlix.cl</span>
+            <span>www.athlixstore.cl</span>
           </div>
           <div class="cotiz-contact-item">
             <span class="cotiz-contact-icon">📷</span>
@@ -1743,38 +1756,15 @@
             </div>
           </div>
 
-          <!-- Productos de interés -->
+          <!-- Productos de interés — lista dinámica -->
           <div class="cotiz-row full" style="margin-bottom:8px">
             <div class="cotiz-group">
-              <label class="cotiz-label">Productos de interés (selecciona uno o más)</label>
+              <label class="cotiz-label">Productos de interés</label>
+              <div style="font-size:12px;color:var(--text-2);margin-top:2px;">Agrega uno o más productos. Puedes escribir libremente si no encuentras el que buscas.</div>
             </div>
           </div>
-          <div class="cotiz-products-grid" style="margin-bottom:14px" id="cotiz-checks">
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Arcos de fútbol"> 🥅 Arcos de fútbol
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Tableros de básquetbol"> 🏀 Tableros básquetbol
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Parantes de voleibol"> 🏐 Parantes voleibol
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Taca taca"> 🎯 Taca taca
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Mesa de ping pong"> 🏓 Mesa ping pong
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Set escolar completo"> 🏟️ Set escolar completo
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Redes y accesorios"> 🕸️ Redes y accesorios
-            </label>
-            <label class="cotiz-product-check" onclick="toggleCheck(this)">
-              <input type="checkbox" value="Otro / no sé aún"> ❓ Otro / no sé aún
-            </label>
-          </div>
+          <div id="cotiz-items-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;"></div>
+          <button type="button" onclick="addCotizItem()" style="display:flex;align-items:center;gap:6px;background:none;border:2px dashed var(--blue);color:var(--blue);border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;width:100%;justify-content:center;margin-bottom:14px;transition:background .2s;" onmouseover="this.style.background='var(--blue-light)'" onmouseout="this.style.background='none'">+ Agregar producto</button>
 
           <!-- Cantidad + Región -->
           <div class="cotiz-row">
@@ -1946,7 +1936,7 @@
         <span class="cart-subtotal-label">Subtotal</span>
         <span class="cart-subtotal-amount" id="cart-subtotal">$0</span>
       </div>
-      <button class="cart-checkout-btn" onclick="showToast('✅ Redirigiendo a pago...'); closeCart()">Finalizar compra →</button>
+      <button class="cart-checkout-btn" onclick="cotizarDesdeCarrito()">Solicitar cotización →</button>
       <button class="cart-continue-btn" onclick="closeCart()">← Seguir comprando</button>
     </div>
   </div>
@@ -2144,9 +2134,10 @@ function normalize(row) {
     tags:      Array.isArray(row.tags) ? row.tags : [],
     abono:     row.abono     || '',
     desc:      row.description || '',
-    inStock:   row.in_stock !== false,
-    stockQty:  row.stock_qty != null ? row.stock_qty : null,
-    sku:       row.sku || null,
+    inStock:    row.in_stock !== false,
+    stockQty:   row.stock_qty != null ? row.stock_qty : null,
+    sku:        row.sku || null,
+    showPrice:  row.show_price !== false,
   };
 }
 
@@ -2187,8 +2178,73 @@ emailjs.init({
   publicKey: EMAILJS_PUBLIC_KEY
 });
 
-function toggleCheck(label) {
-  label.classList.toggle('checked');
+// ─── LISTA DINÁMICA DE PRODUCTOS EN COTIZACIÓN ───────────────────
+let cotizItemCount = 0;
+
+function getCotizProductOptions() {
+  // Opciones desde el catálogo cargado + fijas de respaldo
+  const fromCatalog = products.map(p => `<option value="${p.name}">${p.emoji || ''} ${p.name}</option>`).join('');
+  return `
+    <option value="">— Selecciona o escribe —</option>
+    ${fromCatalog}
+    <option value="Otro producto">❓ Otro (especifica en detalle)</option>
+  `;
+}
+
+function addCotizItem(presetName = '') {
+  cotizItemCount++;
+  const id = cotizItemCount;
+  const list = document.getElementById('cotiz-items-list');
+  const div = document.createElement('div');
+  div.className = 'cotiz-item-row';
+  div.id = `ci-row-${id}`;
+  div.innerHTML = `
+    <div>
+      <select id="ci-name-${id}" style="width:100%;border:none;outline:none;background:transparent;font-size:13px;font-family:var(--font-body);color:var(--text)">
+        ${getCotizProductOptions()}
+      </select>
+      <div class="cotiz-item-detail">
+        <input type="text" id="ci-detail-${id}" placeholder="Detalle opcional: medidas, color, modelo…" style="width:100%;border:none;outline:none;background:transparent;font-size:12px;color:var(--text-2);font-family:var(--font-body)">
+      </div>
+    </div>
+    <input class="ci-qty" type="number" id="ci-qty-${id}" min="1" value="1" style="text-align:center;font-weight:700;width:60px;border:none;outline:none;background:transparent;font-size:13px;font-family:var(--font-body);color:var(--text)">
+    <button type="button" class="ci-remove" onclick="removeCotizItem(${id})" title="Eliminar">✕</button>
+  `;
+  list.appendChild(div);
+  if (presetName) {
+    const sel = document.getElementById(`ci-name-${id}`);
+    // Busca opción exacta, si no la hay la agrega
+    let found = false;
+    for (let opt of sel.options) { if (opt.value === presetName) { sel.value = presetName; found = true; break; } }
+    if (!found) { const o = new Option(presetName, presetName, true, true); sel.add(o); sel.value = presetName; }
+  }
+}
+
+function removeCotizItem(id) {
+  const row = document.getElementById(`ci-row-${id}`);
+  if (row) row.remove();
+}
+
+function getCotizItemsAsText() {
+  const rows = document.querySelectorAll('#cotiz-items-list .cotiz-item-row');
+  const lines = [];
+  rows.forEach(row => {
+    const id = row.id.replace('ci-row-','');
+    const name   = document.getElementById(`ci-name-${id}`)?.value?.trim() || '';
+    const qty    = document.getElementById(`ci-qty-${id}`)?.value || '1';
+    const detail = document.getElementById(`ci-detail-${id}`)?.value?.trim() || '';
+    if (name && name !== '') {
+      lines.push(`${qty}x ${name}${detail ? ' — ' + detail : ''}`);
+    }
+  });
+  return lines;
+}
+
+// Inicializa con 1 fila vacía al cargar
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => addCotizItem());
+} else {
+  addCotizItem();
 }
 
 function previewCotizPhoto(input, num) {
@@ -2261,8 +2317,8 @@ async function sendCotizacion(e) {
   e.preventDefault();
   const btn = document.getElementById('cotiz-btn');
 
-  const checked = [...document.querySelectorAll('#cotiz-checks input:checked')].map(i => i.value);
-  if (checked.length === 0) { showToast('Selecciona al menos un producto', true); return; }
+  const checked = getCotizItemsAsText();
+  if (checked.length === 0) { showToast('Agrega al menos un producto a la lista', true); return; }
 
   const name     = document.getElementById('cq-name').value.trim();
   const email    = document.getElementById('cq-email').value.trim();
@@ -2361,6 +2417,7 @@ function showSection(name) {
   document.getElementById(name).classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   if (name === 'catalog') renderCatalog(products);
+  try { sessionStorage.setItem('athlix_section', name); } catch(e) {}
 }
 function setActive(el) {
   document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
@@ -2392,12 +2449,20 @@ function productCard(p, dark = false) {
         <div class="product-name">${p.name}</div>
         <div class="product-tags">${p.tags.map(t => `<span class="product-tag">${t}</span>`).join('')}</div>
         <div class="product-footer">
+          ${p.showPrice !== false ? `
           <div class="product-price">
             ${p.oldPrice ? `<div class="price-old">$${p.oldPrice.toLocaleString('es-CL')}</div>` : ''}
             <div class="price-main">$${p.price.toLocaleString('es-CL')}</div>
             <div class="price-abono">💳 ${p.abono}</div>
           </div>
           <button class="add-to-cart" onclick="event.stopPropagation(); addCart(${p.id})" ${!inStock ? 'disabled' : ''}>+</button>
+          ` : `
+          <div class="product-price">
+            <div style="font-size:12px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.06em;">Precio a cotizar</div>
+            <div style="font-size:11px;color:var(--text-2);margin-top:2px;">Proyecto personalizado</div>
+          </div>
+          <button class="add-to-cart" onclick="event.stopPropagation(); solicitarCotizacion('${p.name}')" title="Solicitar cotización">✉</button>
+          `}
         </div>
       </div>
     </div>`;
@@ -2425,7 +2490,8 @@ function applyFilters() {
   const q = (document.getElementById('catalog-search')?.value || '').toLowerCase().trim();
   let filtered = products.filter(p => {
     if (checked.length && !checked.includes(p.sport)) return false;
-    if (p.price < minP || p.price > maxP) return false;
+    // Productos "a cotizar" no se filtran por precio
+    if (p.showPrice !== false && (p.price < minP || p.price > maxP)) return false;
     if (q && !p.name.toLowerCase().includes(q) && !(p.desc||'').toLowerCase().includes(q) && !(p.sku||'').toLowerCase().includes(q)) return false;
     return true;
   });
@@ -2467,14 +2533,11 @@ function showDetail(id) {
       </div>
       <div class="detail-brand">${p.brand} · ${p.sport}${p.sku ? ` <span style="font-size:11px;font-weight:700;color:var(--text-2);background:var(--gray-100,#f3f4f6);padding:2px 7px;border-radius:4px;margin-left:6px;letter-spacing:.04em;">SKU: ${p.sku}</span>` : ''}</div>
       <h1 class="detail-title">${p.name}</h1>
-      <div class="detail-rating">
-        <div class="stars">★★★★★</div>
-        <div class="rating-count">4.9 (127 reseñas)</div>
-      </div>
+      ${p.showPrice !== false ? `
       <div class="detail-price">
         ${p.oldPrice ? `<div style="font-size:14px; color:var(--gray-400); text-decoration:line-through">$${p.oldPrice.toLocaleString('es-CL')}</div>` : ''}
         <div class="price-big">$${p.price.toLocaleString('es-CL')}</div>
-        <div class="price-desc" style="color:var(--gray-400); margin-top:4px">IVA incluido · Envío gratis a todo Chile</div>
+        <div class="price-desc" style="color:var(--gray-400); margin-top:4px">IVA incluido · Despacho a coordinar</div>
       </div>
       <div class="abono-info-box">
         <div class="abono-icon">💳</div>
@@ -2491,9 +2554,20 @@ function showDetail(id) {
         <button class="btn-primary" onclick="openPaymentModal(${p.id})">💳 Comprar con abono</button>
         <button class="btn-wish" onclick="addWish(this)">♡</button>
       </div>
+      ` : `
+      <div class="detail-price">
+        <div style="display:inline-block;background:#fff3e0;border:1.5px solid var(--orange);border-radius:8px;padding:10px 18px;margin-bottom:8px;">
+          <div style="font-size:13px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.07em;">Precio a cotizar</div>
+          <div style="font-size:12px;color:var(--text-2);margin-top:3px;line-height:1.5">El precio varía según medidas, cantidad<br>y características del proyecto.</div>
+        </div>
+      </div>
+      <div class="detail-ctas" style="margin-top:1rem">
+        <button class="btn-primary" onclick="solicitarCotizacion('${p.name}')">✉ Solicitar cotización</button>
+        <button class="btn-wish" onclick="addWish(this)">♡</button>
+      </div>
+      `}
       <div class="detail-features">
-        <div class="detail-feat"><span class="feat-icon">🚚</span>Envío gratis</div>
-        <div class="detail-feat"><span class="feat-icon">🔄</span>30 días cambios</div>
+        <div class="detail-feat"><span class="feat-icon">🚚</span>Despacho a todo Chile</div>
         <div class="detail-feat"><span class="feat-icon">🏷️</span>Precio garantizado</div>
         <div class="detail-feat"><span class="feat-icon">💳</span>Forma de pago flexible</div>
       </div>
@@ -2537,6 +2611,44 @@ function openCart() {
 function closeCart() {
   document.getElementById('cart-overlay').classList.remove('open');
   document.body.style.overflow = '';
+}
+function solicitarCotizacion(nombreProducto) {
+  showSection('contact');
+  setActive(document.querySelectorAll('.nav-links a')[3]);
+  setTimeout(() => {
+    document.getElementById('cotiz-items-list').innerHTML = '';
+    cotizItemCount = 0;
+    addCotizItem(nombreProducto);
+    const nameEl = document.getElementById('cq-name');
+    if (nameEl) nameEl.focus();
+  }, 150);
+}
+
+function cotizarDesdeCarrito() {
+  const cartItems = getCart();
+  closeCart();
+  showSection('contact');
+  setActive(document.querySelectorAll('.nav-links a')[3]);
+  // Limpiar lista y pre-cargar con productos del carrito
+  setTimeout(() => {
+    document.getElementById('cotiz-items-list').innerHTML = '';
+    cotizItemCount = 0;
+    if (cartItems.length > 0) {
+      cartItems.forEach(item => {
+        const p = products.find(x => x.id === item.id);
+        if (p) {
+          addCotizItem(p.name);
+          // Actualizar cantidad
+          const qtyInput = document.getElementById(`ci-qty-${cotizItemCount}`);
+          if (qtyInput) qtyInput.value = item.qty;
+        }
+      });
+    } else {
+      addCotizItem();
+    }
+    const nameEl = document.getElementById('cq-name');
+    if (nameEl) nameEl.focus();
+  }, 150);
 }
 document.getElementById('cart-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeCart();
@@ -2890,11 +3002,11 @@ const helpContent = {
         </details>
         <details style="background:var(--gray-100);border-radius:10px;padding:14px;cursor:pointer">
           <summary style="font-weight:700;font-size:14px;list-style:none">¿Hacen instalación?</summary>
-          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">En la Región Metropolitana incluimos instalación sin costo adicional. En regiones se coordina según el pedido.</p>
+          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">Sí, ofrecemos servicio de instalación con costo adicional. El valor depende del tipo de producto y las características del proyecto. Se informa en la cotización.</p>
         </details>
         <details style="background:var(--gray-100);border-radius:10px;padding:14px;cursor:pointer">
           <summary style="font-weight:700;font-size:14px;list-style:none">¿Tienen garantía los productos?</summary>
-          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">Todos nuestros productos tienen garantía por defectos de fabricación. Consulta condiciones específicas en tu cotización.</p>
+          <p style="font-size:13px;color:var(--text-2);margin-top:8px;line-height:1.7">Nuestros productos cuentan con la garantía legal vigente establecida por la Ley del Consumidor en Chile.</p>
         </details>
 
         <div style="background:var(--blue-light);border:1px solid var(--blue);border-radius:12px;padding:16px;margin-top:4px">
@@ -2943,6 +3055,24 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeHelpM
 
 // ─── INIT ───
 renderCatalog(products);
+
+// Restaurar última sección visitada al recargar
+(function() {
+  try {
+    const saved = sessionStorage.getItem('athlix_section');
+    const valid = ['home', 'catalog', 'about', 'contact'];
+    const target = valid.includes(saved) ? saved : 'home';
+    if (target !== 'home') {
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      document.getElementById(target).classList.add('active');
+      if (target === 'catalog') renderCatalog(products);
+      const navIdx = { home: 0, catalog: 1, about: 2, contact: 3 };
+      const navLinks = document.querySelectorAll('.nav-links a');
+      navLinks.forEach(a => a.classList.remove('active'));
+      if (navLinks[navIdx[target]]) navLinks[navIdx[target]].classList.add('active');
+    }
+  } catch(e) {}
+})();
 </script>
 </body>
 </html>

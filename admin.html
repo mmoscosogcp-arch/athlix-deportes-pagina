@@ -321,6 +321,23 @@
   .print-close-btn { position: fixed; top: 16px; right: 16px; background: var(--red); color: white; border: none; border-radius: 8px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; z-index: 1001; }
   @media print { .print-close-btn { display: none !important; } }
 
+  /* ═══ PAGOS ════════════════════════════════════════════════════ */
+  .status-pagado   { background: #D1FAE5; color: #065F46; }
+  .status-vencido  { background: #FEE2E2; color: #991B1B; }
+  .status-parcial  { background: #EDE9FE; color: #5B21B6; }
+
+  .pagos-toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .pagos-table { width: 100%; background: white; border-radius: var(--radius); border: 1px solid var(--gray); overflow: hidden; }
+  .pagos-table table { width: 100%; border-collapse: collapse; }
+  .pagos-table th { text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-2); padding: 12px 16px; background: var(--bg); border-bottom: 1px solid var(--gray); }
+  .pagos-table td { padding: 13px 16px; font-size: 13px; border-bottom: 1px solid var(--gray); vertical-align: middle; }
+  .pagos-table tr:last-child td { border-bottom: none; }
+  .pagos-table tr:hover td { background: #fafafa; }
+
+  /* Modal de pago */
+  #modal-pago-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.55); display: flex; align-items: flex-start; justify-content: center; z-index: 200; overflow-y: auto; padding: 32px 16px 60px; }
+  #modal-pago { background: white; border-radius: 20px; padding: 32px; width: 100%; max-width: 540px; position: relative; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+
   @media (max-width: 640px) {
     .form-row { grid-template-columns: 1fr; }
     #modal { padding: 22px 16px; }
@@ -357,6 +374,9 @@
       </button>
       <button class="tab-btn" onclick="switchTab('clientes')" id="tab-clientes">
         👥 Clientes
+      </button>
+      <button class="tab-btn" onclick="switchTab('pagos')" id="tab-pagos">
+        💰 Pagos <span class="tab-badge" id="pagos-badge" style="display:none">0</span>
       </button>
     </div>
     <div class="header-spacer"></div>
@@ -463,6 +483,30 @@
 
       <!-- Lista de clientes -->
       <div id="cliente-list"><div class="loading"><div class="spinner"></div>Cargando clientes...</div></div>
+    </div>
+  </div>
+
+  <!-- ── TAB: PAGOS ──────────────────────────────────────────── -->
+  <div id="panel-pagos" class="panel">
+    <div class="admin-content">
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="pstat-cobrado" style="color:var(--green)">–</div><div class="stat-label">Total cobrado</div></div>
+        <div class="stat-card"><div class="stat-num" id="pstat-pendiente" style="color:var(--yellow)">–</div><div class="stat-label">Por cobrar</div></div>
+        <div class="stat-card"><div class="stat-num" id="pstat-vencido" style="color:var(--red)">–</div><div class="stat-label">Vencidos</div></div>
+        <div class="stat-card"><div class="stat-num" id="pstat-mes" style="color:var(--blue)">–</div><div class="stat-label">Cobrado este mes</div></div>
+      </div>
+      <div class="pagos-toolbar">
+        <div class="filter-tabs" id="pagos-filter-tabs">
+          <button class="ftab active" onclick="filterPagos('todos',this)">Todos</button>
+          <button class="ftab" onclick="filterPagos('pendiente',this)">Pendientes</button>
+          <button class="ftab" onclick="filterPagos('vencido',this)">Vencidos</button>
+          <button class="ftab" onclick="filterPagos('pagado',this)">Pagados</button>
+          <button class="ftab" onclick="filterPagos('parcial',this)">Parciales</button>
+        </div>
+        <div style="flex:1"></div>
+        <button class="btn btn-primary" onclick="openModalPago()">+ Nuevo pago</button>
+      </div>
+      <div id="pagos-list"><div class="loading"><div class="spinner"></div>Cargando pagos...</div></div>
     </div>
   </div>
 
@@ -612,6 +656,99 @@ ATHLIX STORE SpA</textarea>
   </div>
 </div>
 
+<!-- ═══ MODAL PAGO ═══════════════════════════════════════════════════ -->
+<div id="modal-pago-overlay" style="display:none" onclick="if(event.target===this) closeModalPago()">
+  <div id="modal-pago">
+    <div class="modal-title" id="modal-pago-title">Registrar pago</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">N° Factura</label>
+        <input class="form-input" id="mp-cot-number" type="text" placeholder="Ej: 001234">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre cliente *</label>
+        <input class="form-input" id="mp-client-name" type="text" placeholder="Nombre del cliente">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email cliente *</label>
+      <input class="form-input" id="mp-client-email" type="email" placeholder="cliente@ejemplo.cl">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">RUT empresa <span class="optional">(opcional)</span></label>
+        <input class="form-input" id="mp-client-rut" type="text" placeholder="76.123.456-7">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Razón social <span class="optional">(opcional)</span></label>
+        <input class="form-input" id="mp-client-company" type="text" placeholder="Nombre empresa o institución">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Descripción *</label>
+      <input class="form-input" id="mp-description" type="text" placeholder="Ej: Abono 1 de 3, Saldo final, Cuota única">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Monto total $</label>
+        <input class="form-input" id="mp-amount" type="number" min="0" placeholder="150000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fecha vencimiento</label>
+        <input class="form-input" id="mp-due-date" type="date">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Estado</label>
+        <select class="form-select" id="mp-status" onchange="togglePaidFields()">
+          <option value="pendiente">⏳ Pendiente</option>
+          <option value="pagado">✅ Pagado</option>
+          <option value="parcial">🔵 Parcial</option>
+          <option value="vencido">🔴 Vencido</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Método de pago</label>
+        <select class="form-select" id="mp-method">
+          <option value="">– Sin especificar –</option>
+          <option value="transferencia">Transferencia</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="cheque">Cheque</option>
+          <option value="mercadopago">Mercado Pago</option>
+          <option value="flow">Flow</option>
+          <option value="webpay">Webpay</option>
+        </select>
+      </div>
+    </div>
+    <!-- Campos solo cuando está pagado o parcial -->
+    <div id="mp-paid-fields">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Monto pagado $</label>
+          <input class="form-input" id="mp-amount-paid" type="number" min="0" placeholder="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de pago</label>
+          <input class="form-input" id="mp-paid-date" type="date">
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">N° Referencia / Comprobante <span class="optional">(opcional)</span></label>
+      <input class="form-input" id="mp-reference" type="text" placeholder="N° de transferencia, recibo, etc.">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notas internas <span class="optional">(opcional)</span></label>
+      <textarea class="form-textarea" id="mp-notes" rows="2" placeholder="Observaciones adicionales..."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModalPago()">Cancelar</button>
+      <button class="btn-save" id="btn-save-pago" onclick="saveModalPago()">Guardar pago</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ PRINT VIEW ══════════════════════════════════════════════════ -->
 <div id="print-doc">
   <button class="print-close-btn" onclick="closePrint()">✕ Cerrar</button>
@@ -702,6 +839,14 @@ ATHLIX STORE SpA</textarea>
         </div>
       </div>
       <div class="form-group">
+        <label class="form-label">Mostrar precio</label>
+        <div class="stock-form-row">
+          <button class="toggle-track on" id="f-show-price-btn" onclick="toggleShowPrice()"></button>
+          <span class="stock-form-label" id="f-show-price-lbl" style="color:var(--green)">Precio visible</span>
+        </div>
+        <div class="form-hint">Desactivar = "Precio a cotizar"</div>
+      </div>
+      <div class="form-group">
         <label class="form-label">Cantidad disponible <span class="optional">(opcional)</span></label>
         <input class="form-input" id="f-stock-qty" type="number" min="0" placeholder="Vacío = ilimitado" style="width:100%">
         <div class="form-hint">Si dejas vacío, no se limita la cantidad que puede pedir un cliente.</div>
@@ -739,7 +884,7 @@ const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const supabaseOk = true;
 let productos = [], cotizaciones = [], cotizFilter = 'todas';
 let currentEditId = null, deleteTargetId = null;
-let currentTags = [], formStockValue = true, currentImgUrl = null;
+let currentTags = [], formStockValue = true, currentImgUrl = null, formShowPrice = true;
 let currentCotizId = null;
 // items editor: array de { code, description, category, qty, unit, unit_price, discount }
 let editorItems = [];
@@ -754,6 +899,7 @@ let editorItems = [];
     loadProducts();
     loadCotizaciones();
     loadClientes();
+    loadPagos();
   }
 })();
 
@@ -779,6 +925,7 @@ async function doLogin() {
   loadProducts();
   loadCotizaciones();
   loadClientes();
+  loadPagos();
 }
 async function logout() {
   sessionStorage.removeItem('athlix_admin_tab');
@@ -798,6 +945,7 @@ function switchTab(tab) {
   document.getElementById('panel-' + tab).classList.add('active');
   document.getElementById('btn-new-product').style.display = tab === 'productos' ? '' : 'none';
   sessionStorage.setItem('athlix_admin_tab', tab);
+  if (tab === 'pagos') loadPagos();
 }
 
 function restoreTab() {
@@ -874,7 +1022,7 @@ async function toggleStock(id, cur) {
 
 // Modal producto
 function openModal(id=null) {
-  currentEditId=id; currentTags=[]; currentImgUrl=null; formStockValue=true;
+  currentEditId=id; currentTags=[]; currentImgUrl=null; formStockValue=true; formShowPrice=true;
   document.getElementById('modal-title').textContent = id ? 'Editar producto' : 'Nuevo producto';
   document.getElementById('btn-save').textContent    = id ? 'Guardar cambios' : 'Guardar producto';
   document.getElementById('img-current-note').style.display = 'none';
@@ -884,7 +1032,7 @@ function openModal(id=null) {
   document.getElementById('f-img').value='';
   document.getElementById('img-preview').style.display='none';
   document.getElementById('upload-placeholder').style.display='block';
-  updateFormStock(true); renderTags();
+  updateFormStock(true); updateShowPrice(true); renderTags();
   if (id) { const p=productos.find(x=>x.id===id); if(p) fillForm(p); }
   document.getElementById('modal-overlay').style.display='flex';
   document.getElementById('f-name').focus();
@@ -899,8 +1047,8 @@ function fillForm(p) {
   document.getElementById('f-abono').value   = p.abono||'';
   document.getElementById('f-desc').value    = p.description||'';
   document.getElementById('f-badge').value   = p.badge||'';
-  currentTags=Array.isArray(p.tags)?[...p.tags]:[]; formStockValue=p.in_stock!==false;
-  renderTags(); updateFormStock(formStockValue);
+  currentTags=Array.isArray(p.tags)?[...p.tags]:[]; formStockValue=p.in_stock!==false; formShowPrice=p.show_price!==false;
+  renderTags(); updateFormStock(formStockValue); updateShowPrice(formShowPrice);
   if (p.img_url) {
     currentImgUrl=p.img_url;
     const pr=document.getElementById('img-preview'); pr.src=p.img_url; pr.style.display='block';
@@ -920,6 +1068,14 @@ function updateFormStock(v) {
   const lbl=document.getElementById('f-stock-lbl');
   lbl.style.color=v?'var(--green)':'var(--red)';
   lbl.textContent=v?'En stock':'Sin stock';
+}
+function toggleShowPrice() { updateShowPrice(!formShowPrice); }
+function updateShowPrice(v) {
+  formShowPrice=v;
+  document.getElementById('f-show-price-btn').className='toggle-track'+(v?' on':'');
+  const lbl=document.getElementById('f-show-price-lbl');
+  lbl.style.color=v?'var(--green)':'var(--orange)';
+  lbl.textContent=v?'Precio visible':'Precio a cotizar';
 }
 function addTag() {
   const i=document.getElementById('tag-input'); const v=i.value.trim();
@@ -961,7 +1117,7 @@ async function saveProduct() {
     const skuVal     = document.getElementById('f-sku').value.trim().toUpperCase() || null;
     const stockQtyRaw = document.getElementById('f-stock-qty').value;
     const stockQty   = stockQtyRaw !== '' ? parseInt(stockQtyRaw) : null;
-    const data={sku:skuVal,name,brand:'Athlix',sport:document.getElementById('f-sport').value,price,old_price:parseInt(document.getElementById('f-oldprice').value)||null,img_url:imgUrl||null,emoji:sportEmoji(document.getElementById('f-sport').value),badge:bv||null,badge_type:bv==='Oferta'?'':bv?'blue':'',tags:currentTags,abono:document.getElementById('f-abono').value.trim()||null,description:document.getElementById('f-desc').value.trim()||null,in_stock:formStockValue,stock_qty:stockQty};
+    const data={sku:skuVal,name,brand:'Athlix',sport:document.getElementById('f-sport').value,price,old_price:parseInt(document.getElementById('f-oldprice').value)||null,img_url:imgUrl||null,emoji:sportEmoji(document.getElementById('f-sport').value),badge:bv||null,badge_type:bv==='Oferta'?'':bv?'blue':'',tags:currentTags,abono:document.getElementById('f-abono').value.trim()||null,description:document.getElementById('f-desc').value.trim()||null,in_stock:formStockValue,stock_qty:stockQty,show_price:formShowPrice};
     if(supabaseOk) {
       if(currentEditId){const{error}=await sb.from('products').update(data).eq('id',currentEditId);if(error)throw error;}
       else{const{error}=await sb.from('products').insert(data);if(error)throw error;}
@@ -1372,11 +1528,14 @@ async function loadClientes() {
         client_type: c.client_type || '–',
         rut: c.client_rut || null,
         company_name: c.client_company || null,
-        tipo_doc: c.tipo_documento || 'boleta',
+        tipo_doc: 'boleta',
         cotizaciones: [],
         total_aprobado: 0,
       };
     }
+    // Si cualquiera de sus cotizaciones es factura → es empresa
+    if (c.tipo_documento === 'factura') mapaEmails[email].tipo_doc = 'factura';
+    if (c.client_company && !mapaEmails[email].company_name) mapaEmails[email].company_name = c.client_company;
     mapaEmails[email].cotizaciones.push(c);
     if (c.status === 'aprobada') mapaEmails[email].total_aprobado += (c.total || 0);
   });
@@ -1577,6 +1736,274 @@ async function saveCreditLine() {
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ════════════════════════════════════════════════════════════════
+// PAGOS
+// ════════════════════════════════════════════════════════════════
+let pagos = [];
+let pagosFilter = 'todos';
+let currentPagoId = null;
+
+const PAGO_STATUS_LABELS = {
+  pendiente: '⏳ Pendiente',
+  pagado:    '✅ Pagado',
+  vencido:   '🔴 Vencido',
+  parcial:   '🔵 Parcial',
+};
+const METODO_LABELS = {
+  transferencia: 'Transferencia',
+  efectivo:      'Efectivo',
+  cheque:        'Cheque',
+  mercadopago:   'Mercado Pago',
+  flow:          'Flow',
+  webpay:        'Webpay',
+};
+
+async function loadPagos() {
+  document.getElementById('pagos-list').innerHTML = '<div class="loading"><div class="spinner"></div>Cargando pagos...</div>';
+  try {
+    const { data, error } = await sb.from('payments').select('*').order('due_date', { ascending: true });
+    if (error) throw error;
+    pagos = data || [];
+  } catch(e) {
+    showToast('Error cargando pagos', true);
+    pagos = [];
+  }
+  // Auto-marcar vencidos en UI (no escribe a BD)
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  pagos.forEach(p => {
+    if (p.status === 'pendiente' && p.due_date) {
+      const due = new Date(p.due_date); due.setHours(0,0,0,0);
+      if (due < hoy) p._ui_vencido = true;
+    }
+  });
+  renderPagosList();
+  updatePagosStats();
+}
+
+function uiStatus(p) {
+  return p._ui_vencido ? 'vencido' : p.status;
+}
+
+function updatePagosStats() {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+
+  let cobrado = 0, porCobrar = 0, vencidos = 0, mesCobrado = 0;
+  pagos.forEach(p => {
+    const st = uiStatus(p);
+    if (st === 'pagado') {
+      cobrado += p.amount_paid || p.amount || 0;
+      if (p.paid_date) {
+        const pd = new Date(p.paid_date); pd.setHours(0,0,0,0);
+        if (pd >= primerDiaMes) mesCobrado += p.amount_paid || p.amount || 0;
+      }
+    } else if (st === 'parcial') {
+      cobrado += p.amount_paid || 0;
+      porCobrar += Math.max(0, (p.amount || 0) - (p.amount_paid || 0));
+    } else if (st === 'vencido') {
+      vencidos += p.amount || 0;
+      porCobrar += p.amount || 0;
+    } else {
+      porCobrar += p.amount || 0;
+    }
+  });
+
+  document.getElementById('pstat-cobrado').textContent  = '$' + cobrado.toLocaleString('es-CL');
+  document.getElementById('pstat-pendiente').textContent = '$' + porCobrar.toLocaleString('es-CL');
+  document.getElementById('pstat-mes').textContent      = '$' + mesCobrado.toLocaleString('es-CL');
+
+  const numVencidos = pagos.filter(p => uiStatus(p) === 'vencido').length;
+  document.getElementById('pstat-vencido').textContent = numVencidos;
+  const badge = document.getElementById('pagos-badge');
+  badge.textContent = numVencidos;
+  badge.style.display = numVencidos > 0 ? '' : 'none';
+}
+
+function filterPagos(f, btn) {
+  pagosFilter = f;
+  document.querySelectorAll('#pagos-filter-tabs .ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPagosList();
+}
+
+function renderPagosList() {
+  const lista = pagosFilter === 'todos'
+    ? pagos
+    : pagos.filter(p => uiStatus(p) === pagosFilter);
+  const el = document.getElementById('pagos-list');
+  if (lista.length === 0) {
+    el.innerHTML = '<div class="loading" style="color:var(--text-2)">No hay registros en esta categoría.</div>';
+    return;
+  }
+  el.innerHTML = `<div class="pagos-table"><table>
+    <thead><tr>
+      <th>N° Factura</th><th>Cliente</th><th>Descripción</th>
+      <th style="text-align:right">Monto</th><th style="text-align:right">Pagado</th>
+      <th>Vencimiento</th><th>Estado</th><th>Método</th><th></th>
+    </tr></thead>
+    <tbody>${lista.map(pagoRowHTML).join('')}</tbody>
+  </table></div>`;
+}
+
+function pagoRowHTML(p) {
+  const st      = uiStatus(p);
+  const due     = p.due_date  ? new Date(p.due_date  + 'T00:00:00').toLocaleDateString('es-CL') : '–';
+  const metodo  = METODO_LABELS[p.payment_method] || p.payment_method || '–';
+  const monto   = '$' + (p.amount || 0).toLocaleString('es-CL');
+  const pagado  = (p.amount_paid || 0) > 0 ? '$' + p.amount_paid.toLocaleString('es-CL') : '–';
+  const dueColor = st === 'vencido' ? 'color:var(--red);font-weight:700' : 'color:var(--text-2)';
+  const quickBtn = st !== 'pagado'
+    ? `<button class="btn btn-primary" style="font-size:11px;padding:5px 10px;margin-right:4px" onclick="quickPagar(${p.id})">Marcar pagado</button>`
+    : '';
+  return `<tr>
+    <td style="font-family:monospace;font-weight:800;color:var(--orange)">${esc(p.cot_number || '–')}</td>
+    <td><strong>${esc(p.client_name)}</strong><br><span style="font-size:11px;color:var(--text-2)">${esc(p.client_email)}</span></td>
+    <td style="font-size:13px">${esc(p.description)}</td>
+    <td style="text-align:right;font-weight:700">${monto}</td>
+    <td style="text-align:right;color:var(--green);font-weight:700">${pagado}</td>
+    <td style="font-size:12px;${dueColor}">${due}</td>
+    <td><span class="status-pill status-${st}">${PAGO_STATUS_LABELS[st] || st}</span></td>
+    <td style="font-size:12px;color:var(--text-2)">${metodo}</td>
+    <td style="white-space:nowrap">
+      ${quickBtn}
+      <button class="btn-open" onclick="openModalPago(${p.id})">Editar</button>
+      <button class="btn-open" style="background:var(--orange,#f26a21);color:white;border-color:var(--orange,#f26a21);margin-left:4px" onclick="eliminarPago(${p.id})">🗑</button>
+    </td>
+  </tr>`;
+}
+
+// ── Quick "marcar pagado" ────────────────────────────────────────
+async function quickPagar(id) {
+  const p = pagos.find(x => x.id === id);
+  if (!p) return;
+  const hoy = new Date().toISOString().split('T')[0];
+  const { error } = await sb.from('payments').update({
+    status: 'pagado', paid_date: hoy, amount_paid: p.amount_paid || p.amount
+  }).eq('id', id);
+  if (error) { showToast('Error: ' + error.message, true); return; }
+  showToast('✅ Pago marcado como pagado');
+  loadPagos();
+}
+
+// ── Eliminar pago ────────────────────────────────────────────────
+async function eliminarPago(id) {
+  const p = pagos.find(x => x.id === id);
+  if (!p) return;
+  const confirmMsg = `¿Eliminar este pago?\n\n${p.client_name} — ${p.description}\nMonto: $${(p.amount||0).toLocaleString('es-CL')}\n\nEsta acción no se puede deshacer.`;
+  if (!confirm(confirmMsg)) return;
+  const { error } = await sb.from('payments').delete().eq('id', id);
+  if (error) { showToast('Error al eliminar: ' + error.message, true); return; }
+  showToast('🗑 Pago eliminado');
+  loadPagos();
+}
+
+// ── Modal crear / editar pago ────────────────────────────────────
+function openModalPago(id = null) {
+  currentPagoId = id;
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-pago-title').textContent = id ? 'Editar pago' : 'Registrar pago';
+  document.getElementById('btn-save-pago').textContent    = id ? 'Guardar cambios' : 'Guardar pago';
+
+  // Limpiar
+  ['mp-cot-number','mp-client-name','mp-client-email','mp-client-rut','mp-client-company','mp-description',
+   'mp-amount','mp-amount-paid','mp-reference','mp-notes'].forEach(i => {
+    document.getElementById(i).value = '';
+  });
+  document.getElementById('mp-status').value  = 'pendiente';
+  document.getElementById('mp-method').value  = '';
+  document.getElementById('mp-due-date').value = hoy;
+  document.getElementById('mp-paid-date').value = hoy;
+  togglePaidFields();
+
+  if (id) {
+    const p = pagos.find(x => x.id === id);
+    if (p) {
+      document.getElementById('mp-cot-number').value     = p.cot_number    || '';
+      document.getElementById('mp-client-name').value    = p.client_name   || '';
+      document.getElementById('mp-client-email').value   = p.client_email  || '';
+      document.getElementById('mp-client-rut').value     = p.client_rut    || '';
+      document.getElementById('mp-client-company').value = p.client_company || '';
+      document.getElementById('mp-description').value  = p.description   || '';
+      document.getElementById('mp-amount').value       = p.amount        || '';
+      document.getElementById('mp-amount-paid').value  = p.amount_paid   || '';
+      document.getElementById('mp-due-date').value     = p.due_date      || hoy;
+      document.getElementById('mp-paid-date').value    = p.paid_date     || hoy;
+      document.getElementById('mp-status').value       = p.status        || 'pendiente';
+      document.getElementById('mp-method').value       = p.payment_method || '';
+      document.getElementById('mp-reference').value    = p.reference     || '';
+      document.getElementById('mp-notes').value        = p.notes         || '';
+      togglePaidFields();
+    }
+  }
+
+  document.getElementById('modal-pago-overlay').style.display = 'flex';
+  document.getElementById('mp-client-name').focus();
+}
+
+function closeModalPago() {
+  document.getElementById('modal-pago-overlay').style.display = 'none';
+}
+
+function togglePaidFields() {
+  const st = document.getElementById('mp-status').value;
+  const show = st === 'pagado' || st === 'parcial';
+  document.getElementById('mp-paid-fields').style.display = show ? '' : 'none';
+}
+
+async function saveModalPago() {
+  const clientName  = document.getElementById('mp-client-name').value.trim();
+  const clientEmail = document.getElementById('mp-client-email').value.trim();
+  const description = document.getElementById('mp-description').value.trim();
+  const amount      = parseInt(document.getElementById('mp-amount').value) || 0;
+
+  if (!clientName)  { showToast('El nombre del cliente es obligatorio', true); return; }
+  if (!clientEmail) { showToast('El email del cliente es obligatorio', true); return; }
+  if (!description) { showToast('La descripción es obligatoria', true); return; }
+  if (amount <= 0)  { showToast('Ingresa un monto mayor a 0', true); return; }
+
+  const btn = document.getElementById('btn-save-pago');
+  btn.disabled = true; btn.textContent = 'Guardando...';
+
+  const st = document.getElementById('mp-status').value;
+  const amountPaid = parseInt(document.getElementById('mp-amount-paid').value) || 0;
+  const paidDate   = document.getElementById('mp-paid-date').value || null;
+
+  const data = {
+    cot_number:     document.getElementById('mp-cot-number').value.trim() || null,
+    client_name:    clientName,
+    client_email:   clientEmail,
+    client_rut:     document.getElementById('mp-client-rut').value.trim() || null,
+    client_company: document.getElementById('mp-client-company').value.trim() || null,
+    description,
+    amount,
+    due_date:       document.getElementById('mp-due-date').value || null,
+    status:         st,
+    payment_method: document.getElementById('mp-method').value || null,
+    amount_paid:    (st === 'pagado' || st === 'parcial') ? amountPaid : 0,
+    paid_date:      (st === 'pagado' || st === 'parcial') ? paidDate   : null,
+    reference:      document.getElementById('mp-reference').value.trim() || null,
+    notes:          document.getElementById('mp-notes').value.trim() || null,
+  };
+
+  try {
+    if (currentPagoId) {
+      const { error } = await sb.from('payments').update(data).eq('id', currentPagoId);
+      if (error) throw error;
+    } else {
+      const { error } = await sb.from('payments').insert(data);
+      if (error) throw error;
+    }
+    closeModalPago();
+    showToast(currentPagoId ? '✅ Pago actualizado' : '✅ Pago registrado');
+    loadPagos();
+  } catch(e) {
+    showToast('Error: ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = currentPagoId ? 'Guardar cambios' : 'Guardar pago';
+  }
 }
 </script>
 </body>
