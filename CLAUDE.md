@@ -51,6 +51,7 @@ Formato: `ATH-[CATEGORIA]-[NUMERO]`
 | VOL | Voleibol |
 | TAC | Taca Taca |
 | PAK | Packs / Sets |
+| HAN | Handball |
 | OTR | Otros deportes |
 
 ## Convenciones del código

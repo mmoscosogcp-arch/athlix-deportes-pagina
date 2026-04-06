@@ -1394,13 +1394,13 @@
   <!-- Hero -->
   <div class="hero">
     <div class="hero-left">
-      <div class="hero-tag">Fabricación profesional · Chile</div>
+      <div class="hero-tag">Equipamiento deportivo · Chile</div>
       <h1 class="hero-title">
         <span>Equipamiento</span><br>
         <span class="line-accent">deportivo</span><br>
         <span class="line-stroke">profesional.</span>
       </h1>
-      <p class="hero-sub">Arcos de fútbol, taca-taca, tableros de básquetbol y parantes de voleibol. Fabricados para durar, diseñados para rendir.</p>
+      <p class="hero-sub">Arcos de fútbol, taca-taca, tableros de básquetbol y parantes de voleibol. Equipamiento de calidad para colegios, clubes y municipalidades en todo Chile.</p>
       <div class="hero-ctas">
         <a class="btn-primary" onclick="showSection('contact'); setActive(document.querySelectorAll('.nav-links a')[3])" style="cursor:pointer">Cotizar gratis ahora →</a>
         <a class="btn-secondary" onclick="showSection('catalog'); setActive(document.querySelectorAll('.nav-links a')[1])" style="cursor:pointer">Ver catálogo completo</a>
@@ -1408,7 +1408,7 @@
       <div class="hero-stats">
         <div>
           <div class="hero-stat-num">A medida</div>
-          <div class="hero-stat-label">Fabricación propia</div>
+          <div class="hero-stat-label">Productos personalizados</div>
         </div>
         <div>
           <div class="hero-stat-num">Crédito</div>
@@ -1464,6 +1464,11 @@
         <div class="cat-name">Taca Taca</div>
         <div class="cat-count">2 productos</div>
       </div>
+      <div class="cat-card" onclick="filterCatalog('Handball')">
+        <div class="cat-emoji">🤾</div>
+        <div class="cat-name">Handball</div>
+        <div class="cat-count">0 productos</div>
+      </div>
       <div class="cat-card" onclick="filterCatalog('Otros deportes')">
         <div class="cat-emoji">🏅</div>
         <div class="cat-name">Otros deportes</div>
@@ -1499,7 +1504,7 @@
       </div>
       <div class="benefit-card">
         <div class="benefit-icon">📐</div>
-        <div class="benefit-title">Fabricación a medida</div>
+        <div class="benefit-title">Productos a medida</div>
         <div class="benefit-desc">Personalizamos dimensiones y colores según tu espacio. La instalación tiene un costo adicional que se cotiza según el proyecto.</div>
       </div>
       <div class="benefit-card">
@@ -1550,6 +1555,7 @@
           <label class="filter-opt"><input type="checkbox" value="Básquetbol" onchange="applyFilters()"> Básquetbol <span class="filter-count">3</span></label>
           <label class="filter-opt"><input type="checkbox" value="Voleibol" onchange="applyFilters()"> Voleibol <span class="filter-count">2</span></label>
           <label class="filter-opt"><input type="checkbox" value="Taca Taca" onchange="applyFilters()"> Taca Taca <span class="filter-count">2</span></label>
+          <label class="filter-opt"><input type="checkbox" value="Handball" onchange="applyFilters()"> Handball <span class="filter-count">0</span></label>
           <label class="filter-opt"><input type="checkbox" value="Otros deportes" onchange="applyFilters()"> Otros deportes <span class="filter-count">2</span></label>
         </div>
       </div>
@@ -2103,6 +2109,7 @@
           <a href="#" onclick="filterCatalog('Básquetbol')">Básquetbol</a>
           <a href="#" onclick="filterCatalog('Voleibol')">Voleibol</a>
           <a href="#" onclick="filterCatalog('Taca Taca')">Taca Taca</a>
+          <a href="#" onclick="filterCatalog('Handball')">Handball</a>
           <a href="#" onclick="filterCatalog('Otros deportes')">Otros deportes</a>
         </div>
       </div>
@@ -2128,9 +2135,6 @@
       <div class="footer-copy">© 2025 Athlix Store. Todos los derechos reservados.</div>
       <div class="footer-methods">
         <div class="payment-method">Transferencia</div>
-        <div class="payment-method">WebPay</div>
-        <div class="payment-method">Débito</div>
-        <div class="payment-method">Crédito</div>
         <div class="payment-method">Abonos</div>
       </div>
     </div>
@@ -2469,7 +2473,7 @@ function setActive(el) {
   el.classList.add('active');
 }
 // ─── MARQUEE ───
-const marqueeItems = ['🥅 Arcos de fútbol','🏀 Tableros de básquetbol','🏐 Parantes de voleibol','🎯 Taca taca','📐 Fabricación a medida','🚚 Despacho a todo Chile','💳 Línea de crédito disponible','🏫 Colegios · Municipios · Clubes'];
+const marqueeItems = ['🥅 Arcos de fútbol','🏀 Tableros de básquetbol','🏐 Parantes de voleibol','🎯 Taca taca','📐 Productos a medida','🚚 Despacho a todo Chile','💳 Línea de crédito disponible','🏫 Colegios · Municipios · Clubes'];
 const marqueeTrack = document.getElementById('marquee');
 const doubled = [...marqueeItems, ...marqueeItems];
 marqueeTrack.innerHTML = doubled.map(item => `<span class="marquee-item">${item}<span class="marquee-dot"></span></span>`).join('');
@@ -3010,7 +3014,7 @@ const helpContent = {
         <div style="display:flex;flex-direction:column;gap:10px">
           <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
             <span style="font-size:20px">🏗️</span>
-            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Fabricación</strong><span style="font-size:12px;color:var(--text-2)">Entre 5 y 15 días hábiles dependiendo de la complejidad y cantidad del pedido. Te informamos el plazo exacto en la cotización.</span></div>
+            <div><strong style="display:block;font-size:13px;margin-bottom:2px">Preparación del pedido</strong><span style="font-size:12px;color:var(--text-2)">Entre 5 y 15 días hábiles dependiendo de la complejidad y cantidad del pedido. Te informamos el plazo exacto en la cotización.</span></div>
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--gray-100);border-radius:10px">
             <span style="font-size:20px">🚚</span>
